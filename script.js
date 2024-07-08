@@ -11,13 +11,18 @@ function createTask(text) {
     const taskItem = document.createElement('li');
     taskItem.className = 'task-item';
     taskItem.innerHTML = `
+        <input type="checkbox" class="task-checkbox">
         <span>${text}</span>
         <button class="delete-button">Excluir</button>
     `;
 
     // Adicionar a funcionalidade de marcar como concluída
-    taskItem.addEventListener('click', () => {
-        taskItem.classList.toggle('completed');
+    taskItem.querySelector('.task-checkbox').addEventListener('change', (event) => {
+        if (event.target.checked) {
+            taskItem.classList.add('completed');
+        } else {
+            taskItem.classList.remove('completed');
+        }
     });
 
     // Adicionar a funcionalidade de excluir a tarefa

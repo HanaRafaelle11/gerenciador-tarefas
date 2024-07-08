@@ -79,6 +79,10 @@ h1 {
     border-bottom: 1px solid #ddd;
 }
 
+.task-item input[type="checkbox"] {
+    margin-right: 10px;
+}
+
 .task-item button {
     background-color: #dc3545;
     color: #fff;
