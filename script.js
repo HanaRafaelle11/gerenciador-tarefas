@@ -117,7 +117,7 @@ completedTasksButton.addEventListener('click', () => {
     });
 });
 
-// Função para atualizar contadores de tarefas
+// Atualizar contadores de tarefas
 function updateCounters() {
     const totalTasks = document.querySelectorAll('.task-item').length;
     const completedTasks = document.querySelectorAll('.task-item.completed').length;

@@ -23,14 +23,14 @@ h1 {
 
 .task-form {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 10px;
     margin-bottom: 20px;
 }
 
 .task-form input[type="text"],
-.task-form input[type="date"] {
-    flex: 1;
-    margin-right: 10px;
+.task-form input[type="date"],
+.task-form select {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 3px;
@@ -55,10 +55,9 @@ h1 {
     margin-bottom: 10px;
 }
 
-.task-filters button {
+.filter-button {
     padding: 10px;
     border: none;
-    background-color: #007bff;
     color: #fff;
     border-radius: 3px;
     cursor: pointer;
@@ -66,8 +65,32 @@ h1 {
     margin-right: 5px;
 }
 
-.task-filters button:hover {
+.filter-button:last-child {
+    margin-right: 0;
+}
+
+.blue {
+    background-color: #007bff;
+}
+
+.blue:hover {
     background-color: #0056b3;
+}
+
+.red {
+    background-color: #dc3545;
+}
+
+.red:hover {
+    background-color: #c82333;
+}
+
+.green {
+    background-color: #28a745;
+}
+
+.green:hover {
+    background-color: #218838;
 }
 
 .task-counters {
