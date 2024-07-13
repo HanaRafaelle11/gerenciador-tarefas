@@ -103,10 +103,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const logChange = (message) => {
         const logItem = document.createElement('li');
         logItem.textContent = message;
-        logItem.classList.add('change-log-content');
+        logItem.classList.add('change-log-item');
         logItem.addEventListener('click', () => {
             logItem.classList.toggle('open');
         });
+        logItem.innerHTML = `
+            ${message}
+            <div class="change-log-content open">
+                <p>${message}</p>
+            </div>
+        `;
         changeLogList.appendChild(logItem);
     };
 
