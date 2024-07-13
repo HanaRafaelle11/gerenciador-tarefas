@@ -9,46 +9,33 @@
 <body>
     <header>
         <h1>Gerenciador de Tarefas</h1>
+        <button id="theme-toggle">Tema Escuro</button>
     </header>
     <main>
-        <section id="task-form">
-            <input type="text" id="task-input" placeholder="Digite uma nova tarefa">
-            <input type="date" id="task-due-date">
-            <select id="task-category">
-                <option value="">Categoria</option>
-            </select>
-            <select id="task-priority">
-                <option value="">Prioridade</option>
-                <option value="Baixa">Baixa</option>
-                <option value="Média">Média</option>
-                <option value="Alta">Alta</option>
-            </select>
-            <input type="file" id="task-file" accept="image/*">
-            <button id="add-task-button">Adicionar Tarefa</button>
+        <section id="task-form-section">
+            <form id="task-form">
+                <input type="text" id="task-name" placeholder="Nome da Tarefa" required>
+                <input type="date" id="task-date" required>
+                <select id="task-priority">
+                    <option value="baixa">Baixa</option>
+                    <option value="media">Média</option>
+                    <option value="alta">Alta</option>
+                </select>
+                <button type="submit">Adicionar Tarefa</button>
+            </form>
         </section>
-        <section id="task-filters">
-            <button id="all-tasks-button">Todas</button>
-            <button id="pending-tasks-button">Pendentes</button>
-            <button id="completed-tasks-button">Concluídas</button>
-            <select id="filter-category">
-                <option value="">Filtrar por Categoria</option>
-            </select>
-            <select id="filter-priority">
-                <option value="">Filtrar por Prioridade</option>
-            </select>
-            <button id="sort-by-date-button">Ordenar por Data</button>
-            <button id="toggle-theme-button">Tema Escuro</button>
+        <section id="task-filter-section">
+            <button id="all-tasks">Todas</button>
+            <button id="pending-tasks">Pendentes</button>
+            <button id="completed-tasks">Concluídas</button>
+            <button id="clear-tasks">Limpar Tudo</button>
         </section>
-        <section id="task-list">
-            <ul id="task-list-container">
-                <!-- Tarefas serão inseridas aqui -->
-            </ul>
+        <section id="task-list-section">
+            <ul id="task-list"></ul>
         </section>
-        <section id="change-log">
-            <h2>Log de Mudanças</h2>
-            <ul id="change-log-list">
-                <!-- Log de mudanças será exibido aqui -->
-            </ul>
+        <section id="change-log-section">
+            <h2>Histórico de Alterações</h2>
+            <ul id="change-log-list"></ul>
         </section>
     </main>
     <script src="script.js"></script>

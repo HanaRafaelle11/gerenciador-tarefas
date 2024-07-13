@@ -1,209 +1,150 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-}
+document.addEventListener('DOMContentLoaded', () => {
+    const taskForm = document.getElementById('task-form');
+    const taskNameInput = document.getElementById('task-name');
+    const taskDateInput = document.getElementById('task-date');
+    const taskPrioritySelect = document.getElementById('task-priority');
+    const taskList = document.getElementById('task-list');
+    const changeLogList = document.getElementById('change-log-list');
+    const themeToggleButton = document.getElementById('theme-toggle');
+    let darkTheme = localStorage.getItem('dark-theme') === 'true';
 
-.container {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    width: 400px;
-    max-width: 100%;
-    overflow: hidden;
-}
+    const setDarkTheme = (isDark) => {
+        if (isDark) {
+            document.body.classList.add('dark-theme');
+            themeToggleButton.textContent = 'Tema Claro';
+        } else {
+            document.body.classList.remove('dark-theme');
+            themeToggleButton.textContent = 'Tema Escuro';
+        }
+        localStorage.setItem('dark-theme', isDark);
+    };
 
-h1 {
-    margin: 0 0 20px;
-    text-align: center;
-}
+    setDarkTheme(darkTheme);
 
-.task-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
-}
+    themeToggleButton.addEventListener('click', () => {
+        darkTheme = !darkTheme;
+        setDarkTheme(darkTheme);
+    });
 
-.task-form input[type="text"],
-.task-form input[type="date"],
-.task-form select,
-.task-form input[type="file"] {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-}
+    const addTask = (name, date, priority) => {
+        const taskItem = document.createElement('li');
+        taskItem.className = 'task-item';
+        taskItem.draggable = true;
 
-.task-form button {
-    padding: 10px 15px;
-    border: none;
-    background-color: #28a745;
-    color: #fff;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+        const taskContent = document.createElement('div');
+        taskContent.className = 'task-content';
+        taskContent.innerHTML = `
+            <div>
+                <strong>${name}</strong> - ${date} - Prioridade: ${priority}
+            </div>
+            <img src="https://via.placeholder.com/50" alt="Imagem Tarefa">
+        `;
 
-.task-form button:hover {
-    background-color: #218838;
-}
+        const completeButton = document.createElement('button');
+        completeButton.textContent = 'Concluir';
+        completeButton.addEventListener('click', () => {
+            taskItem.classList.toggle('completed');
+            logChange(`Tarefa "${name}" marcada como ${taskItem.classList.contains('completed') ? 'concluída' : 'pendente'}`);
+        });
 
-.task-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 10px;
-}
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Excluir';
+        deleteButton.addEventListener('click', () => {
+            if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+                taskItem.remove();
+                logChange(`Tarefa "${name}" excluída`);
+            }
+        });
 
-.filter-button {
-    padding: 10px;
-    border: none;
-    color: #fff;
-    border-radius: 3px;
-    cursor: pointer;
-    flex: 1;
-    transition: background-color 0.3s;
-}
+        taskItem.append(taskContent, completeButton, deleteButton);
+        taskList.appendChild(taskItem);
 
-.filter-button.blue {
-    background-color: #007bff;
-}
+        taskItem.addEventListener('dragstart', (event) => {
+            event.dataTransfer.setData('text/plain', taskItem.innerHTML);
+            event.dataTransfer.setData('text/task-name', name);
+            taskItem.classList.add('dragging');
+        });
 
-.filter-button.blue:hover {
-    background-color: #0056b3;
-}
+        taskItem.addEventListener('dragend', () => {
+            taskItem.classList.remove('dragging');
+        });
 
-.filter-button.red {
-    background-color: #dc3545;
-}
+        taskList.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            const afterElement = getDragAfterElement(taskList, event.clientY);
+            const draggingItem = document.querySelector('.dragging');
+            if (afterElement == null) {
+                taskList.appendChild(draggingItem);
+            } else {
+                taskList.insertBefore(draggingItem, afterElement);
+            }
+        });
 
-.filter-button.red:hover {
-    background-color: #c82333;
-}
+        taskList.addEventListener('drop', () => {
+            logChange(`Tarefa "${name}" movida`);
+        });
+    };
 
-.filter-button.green {
-    background-color: #28a745;
-}
+    const getDragAfterElement = (container, y) => {
+        const draggableElements = [...container.querySelectorAll('.task-item:not(.dragging)')];
 
-.filter-button.green:hover {
-    background-color: #218838;
-}
+        return draggableElements.reduce(
+            (closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            },
+            { offset: Number.NEGATIVE_INFINITY }
+        ).element;
+    };
 
-.filter-select {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    cursor: pointer;
-}
+    const logChange = (message) => {
+        const logItem = document.createElement('li');
+        logItem.textContent = message;
+        changeLogList.appendChild(logItem);
+    };
 
-.task-counters {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
+    taskForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = taskNameInput.value.trim();
+        const date = taskDateInput.value;
+        const priority = taskPrioritySelect.value;
 
-.task-counters span {
-    font-weight: bold;
-}
+        if (name && date) {
+            addTask(name, date, priority);
+            logChange(`Tarefa "${name}" adicionada`);
+            taskNameInput.value = '';
+            taskDateInput.value = '';
+        }
+    });
 
-.task-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
+    const filterTasks = (filter) => {
+        Array.from(taskList.children).forEach(taskItem => {
+            switch (filter) {
+                case 'all':
+                    taskItem.style.display = '';
+                    break;
+                case 'pending':
+                    taskItem.style.display = taskItem.classList.contains('completed') ? 'none' : '';
+                    break;
+                case 'completed':
+                    taskItem.style.display = taskItem.classList.contains('completed') ? '' : 'none';
+                    break;
+            }
+        });
+    };
 
-.task-item {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    margin-bottom: 10px;
-    background-color: #fff;
-    position: relative;
-    transition: background-color 0.3s, box-shadow 0.3s;
-}
-
-.task-item.dragging {
-    opacity: 0.5;
-}
-
-.task-item.completed {
-    background-color: #d4edda;
-    text-decoration: line-through;
-}
-
-.task-item input[type="checkbox"] {
-    margin-right: 10px;
-}
-
-.task-item span {
-    flex: 1;
-}
-
-.task-item button {
-    background-color: #ffc107;
-    border: none;
-    padding: 5px 10px;
-    margin-top: 10px;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.task-item button:hover {
-    background-color: #e0a800;
-}
-
-.task-item button.delete-button {
-    background-color: #dc3545;
-    color: #fff;
-}
-
-.task-item button.delete-button:hover {
-    background-color: #c82333;
-}
-
-.task-item img {
-    max-width: 100px;
-    max-height: 100px;
-    margin-top: 10px;
-}
-
-.dark-theme {
-    background-color: #333;
-    color: #f4f4f4;
-}
-
-.dark-theme .container {
-    background-color: #444;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
-}
-
-.dark-theme .task-item {
-    background-color: #555;
-    border: 1px solid #666;
-}
-
-.dark-theme .filter-button {
-    background-color: #222;
-}
-
-.dark-theme .filter-button:hover {
-    background-color: #111;
-}
-
-.dark-theme .filter-select {
-    background-color: #555;
-    border-color: #666;
-    color: #f4f4f4;
-}
-
-.dark-theme #changeLog {
-    color: #f4f4f4;
-}
+    document.getElementById('all-tasks').addEventListener('click', () => filterTasks('all'));
+    document.getElementById('pending-tasks').addEventListener('click', () => filterTasks('pending'));
+    document.getElementById('completed-tasks').addEventListener('click', () => filterTasks('completed'));
+    document.getElementById('clear-tasks').addEventListener('click', () => {
+        if (confirm('Tem certeza que deseja limpar todas as tarefas?')) {
+            taskList.innerHTML = '';
+            logChange('Todas as tarefas excluídas');
+        }
+    });
+});
