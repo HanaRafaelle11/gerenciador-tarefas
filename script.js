@@ -7,25 +7,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const taskList = document.getElementById('task-list');
     const changeLogList = document.getElementById('change-log-list');
     const themeToggleButton = document.getElementById('theme-toggle');
+    const changeLogTitle = document.getElementById('change-log-title');
+
     let darkTheme = localStorage.getItem('dark-theme') === 'true';
 
     const setDarkTheme = (isDark) => {
         if (isDark) {
             document.body.classList.add('dark-theme');
-            themeToggleButton.textContent = 'Tema Claro';
         } else {
             document.body.classList.remove('dark-theme');
-            themeToggleButton.textContent = 'Tema Escuro';
         }
+        themeToggleButton.textContent = isDark ? 'Tema Claro' : 'Tema Escuro';
     };
-
-    setDarkTheme(darkTheme);
-
-    themeToggleButton.addEventListener('click', () => {
-        darkTheme = !darkTheme;
-        localStorage.setItem('dark-theme', darkTheme);
-        setDarkTheme(darkTheme);
-    });
 
     const addTask = (name, date, priority, segment) => {
         const taskItem = document.createElement('li');
@@ -46,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         completeButton.addEventListener('click', () => {
             taskItem.classList.toggle('completed');
             logChange(`Tarefa "${name}" ${taskItem.classList.contains('completed') ? 'concluída' : 'revertida'}`);
+            saveTasks();
         });
 
         const deleteButton = taskItem.querySelector('.delete-button');
@@ -54,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 taskItem.classList.add('deleted');
                 taskItem.style.display = 'none';
                 logChange(`Tarefa "${name}" excluída`);
+                saveTasks();
             }
         });
 
@@ -80,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         taskList.addEventListener('drop', () => {
             logChange(`Tarefa "${name}" movida`);
+            saveTasks();
         });
     };
 
@@ -109,27 +105,52 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         logItem.innerHTML = `
             ${message}
-            <div class="change-log-content open">
+            <div class="change-log-content">
                 <p>${message}</p>
             </div>
         `;
         changeLogList.appendChild(logItem);
     };
 
-    taskForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const name = taskNameInput.value.trim();
-        const date = taskDateInput.value;
-        const priority = taskPrioritySelect.value;
-        const segment = taskSegmentSelect.value;
+    const saveTasks = () => {
+        const tasks = Array.from(taskList.children).map(taskItem => ({
+            name: taskItem.querySelector('strong').textContent,
+            date: taskItem.querySelector('p').textContent.replace('Data: ', ''),
+            priority: taskItem.querySelector('p').nextElementSibling.textContent.replace('Prioridade: ', ''),
+            segment: taskItem.querySelector('p').nextElementSibling.nextElementSibling.textContent.replace('Segmento: ', ''),
+            completed: taskItem.classList.contains('completed'),
+            deleted: taskItem.classList.contains('deleted'),
+        }));
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    };
 
-        if (name && date) {
-            addTask(name, date, priority, segment);
-            logChange(`Tarefa "${name}" adicionada`);
-            taskNameInput.value = '';
-            taskDateInput.value = '';
-        }
-    });
+    const loadTasks = () => {
+        const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        tasks.forEach(task => {
+            addTask(task.name, task.date, task.priority, task.segment);
+            if (task.completed) {
+                taskList.lastChild.classList.add('completed');
+            }
+            if (task.deleted) {
+                taskList.lastChild.classList.add('deleted');
+                taskList.lastChild.style.display = 'none';
+            }
+        });
+    };
+
+    const setFilters = () => {
+        document.getElementById('all-tasks').addEventListener('click', () => filterTasks('all'));
+        document.getElementById('pending-tasks').addEventListener('click', () => filterTasks('pending'));
+        document.getElementById('completed-tasks').addEventListener('click', () => filterTasks('completed'));
+        document.getElementById('deleted-tasks').addEventListener('click', () => filterTasks('deleted'));
+        document.getElementById('clear-tasks').addEventListener('click', () => {
+            if (confirm('Tem certeza que deseja limpar todas as tarefas?')) {
+                taskList.innerHTML = '';
+                logChange('Todas as tarefas excluídas');
+                saveTasks();
+            }
+        });
+    };
 
     const filterTasks = (filter) => {
         Array.from(taskList.children).forEach(taskItem => {
@@ -150,14 +171,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    document.getElementById('all-tasks').addEventListener('click', () => filterTasks('all'));
-    document.getElementById('pending-tasks').addEventListener('click', () => filterTasks('pending'));
-    document.getElementById('completed-tasks').addEventListener('click', () => filterTasks('completed'));
-    document.getElementById('deleted-tasks').addEventListener('click', () => filterTasks('deleted'));
-    document.getElementById('clear-tasks').addEventListener('click', () => {
-        if (confirm('Tem certeza que deseja limpar todas as tarefas?')) {
-            taskList.innerHTML = '';
-            logChange('Todas as tarefas excluídas');
+    const toggleChangeLog = () => {
+        changeLogList.classList.toggle('open');
+        changeLogTitle.textContent = changeLogList.classList.contains('open') ? 'Histórico de Alterações' : 'Mostrar Histórico de Alterações';
+    };
+
+    changeLogTitle.addEventListener('click', toggleChangeLog);
+
+    taskForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = taskNameInput.value.trim();
+        const date = taskDateInput.value;
+        const priority = taskPrioritySelect.value;
+        const segment = taskSegmentSelect.value;
+
+        if (name && date) {
+            addTask(name, date, priority, segment);
+            logChange(`Tarefa "${name}" adicionada`);
+            saveTasks();
+            taskNameInput.value = '';
+            taskDateInput.value = '';
         }
     });
+
+    themeToggleButton.addEventListener('click', () => {
+        darkTheme = !darkTheme;
+        localStorage.setItem('dark-theme', darkTheme);
+        setDarkTheme(darkTheme);
+    });
+
+    // Carregar tarefas e tema ao iniciar
+    loadTasks();
+    setDarkTheme(darkTheme);
+    setFilters();
 });
