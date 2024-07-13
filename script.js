@@ -1,3 +1,5 @@
+// scripts.js
+
 // Selecionar elementos
 const taskInput = document.getElementById('taskInput');
 const taskDueDate = document.getElementById('taskDueDate');
@@ -15,7 +17,7 @@ const sortByDateButton = document.getElementById('sortByDate');
 const pendingCount = document.getElementById('pendingCount');
 const completedCount = document.getElementById('completedCount');
 const changeLog = document.getElementById('changeLog');
-const toggleThemeButton = document.getElementById('toggleTheme');
+const toggleThemeButton = document.getElementById('toggleThemeButton');
 
 // Função para carregar tarefas do local storage
 function loadTasks() {
@@ -37,7 +39,7 @@ function saveTasks() {
         const dueDate = taskItem.getAttribute('data-due-date');
         const category = taskItem.getAttribute('data-category');
         const priority = taskItem.getAttribute('data-priority');
-        const file = taskItem.getAttribute('data-file');
+        const file = taskItem.querySelector('img') ? taskItem.querySelector('img').src : '';
         tasks.push({ text, completed, dueDate, category, priority, file });
     });
     localStorage.setItem('tasks', JSON.stringify(tasks));
@@ -56,7 +58,7 @@ function createTask(text, completed = false, dueDate = '', category = '', priori
         <input type="checkbox" class="task-checkbox" ${completed ? 'checked' : ''}>
         <span>${text}</span>
         <small>${dueDate ? `Vencimento: ${dueDate}` : ''} ${category ? `Categoria: ${category}` : ''} ${priority ? `Prioridade: ${priority}` : ''}</small>
-        ${file ? `<a href="${file}" target="_blank">Arquivo Anexado</a>` : ''}
+        ${file ? `<img src="${file}" class="task-file-preview" alt="Anexo da Tarefa">` : ''}
         <button class="edit-button">Editar</button>
         <button class="delete-button">Excluir</button>
     `;
@@ -74,67 +76,40 @@ function createTask(text, completed = false, dueDate = '', category = '', priori
         updateCounters();
     });
 
-    // Adicionar a funcionalidade de excluir a tarefa
-    taskItem.querySelector('.delete-button').addEventListener('click', (event) => {
-        event.stopPropagation();
-        logChange(`Tarefa "${text}" excluída.`);
-        taskItem.remove();
+    // Adicionar a funcionalidade de editar tarefa
+    taskItem.querySelector('.edit-button').addEventListener('click', () => {
+        taskInput.value = text;
+        taskDueDate.value = dueDate;
+        taskCategory.value = category;
+        taskPriority.value = priority;
+        taskFile.value = '';
+        taskList.removeChild(taskItem);
         saveTasks();
         updateCounters();
+        logChange(`Tarefa "${text}" removida para edição.`);
     });
 
-    // Adicionar a funcionalidade de editar a tarefa
-    taskItem.querySelector('.edit-button').addEventListener('click', () => {
-        const newText = prompt('Edite a tarefa:', taskItem.querySelector('span').textContent);
-        const newCategory = prompt('Edite a categoria:', category);
-        const newPriority = prompt('Edite a prioridade:', priority);
-        if (newText !== null && newText.trim() !== '') {
-            taskItem.querySelector('span').textContent = newText;
-            taskItem.setAttribute('data-category', newCategory);
-            taskItem.setAttribute('data-priority', newPriority);
-            logChange(`Tarefa alterada para "${newText}", Categoria: "${newCategory}", Prioridade: "${newPriority}".`);
-            saveTasks();
-        }
-    });
-
-    // Função para permitir drag and drop
-    taskItem.draggable = true;
-    taskItem.addEventListener('dragstart', (event) => {
-        event.dataTransfer.setData('text/plain', text);
-    });
-
-    taskList.addEventListener('dragover', (event) => {
-        event.preventDefault();
-    });
-
-    taskList.addEventListener('drop', (event) => {
-        event.preventDefault();
-        const draggedText = event.dataTransfer.getData('text/plain');
-        const draggedTask = Array.from(taskList.children).find(item => item.querySelector('span').textContent === draggedText);
-        if (draggedTask) {
-            const rect = taskList.getBoundingClientRect();
-            const offset = (event.clientY - rect.top) / rect.height;
-            if (offset < 0.5) {
-                taskList.insertBefore(draggedTask, taskList.children[0]);
-            } else {
-                taskList.appendChild(draggedTask);
-            }
-            saveTasks();
-        }
+    // Adicionar a funcionalidade de excluir tarefa
+    taskItem.querySelector('.delete-button').addEventListener('click', () => {
+        taskList.removeChild(taskItem);
+        saveTasks();
+        updateCounters();
+        logChange(`Tarefa "${text}" excluída.`);
     });
 
     return taskItem;
 }
 
-// Adicionar nova tarefa
+// Adicionar uma nova tarefa
 addTaskButton.addEventListener('click', () => {
-    const taskText = taskInput.value.trim();
-    const taskDue = taskDueDate.value;
-    const taskCat = taskCategory.value.trim();
-    const taskPri = taskPriority.value.trim();
+    const text = taskInput.value.trim();
+    const dueDate = taskDueDate.value;
+    const category = taskCategory.value;
+    const priority = taskPriority.value;
     const file = taskFile.files[0] ? URL.createObjectURL(taskFile.files[0]) : '';
-    if (taskText) {
-        const taskItem = createTask(taskText, false, taskDue, taskCat, taskPri, file);
+
+    if (text) {
+        const taskItem = createTask(text, false, dueDate, category, priority, file);
         taskList.appendChild(taskItem);
         taskInput.value = '';
         taskDueDate.value = '';
@@ -143,67 +118,91 @@ addTaskButton.addEventListener('click', () => {
         taskFile.value = '';
         saveTasks();
         updateCounters();
+        logChange(`Nova tarefa adicionada: "${text}".`);
+        // Atualiza opções de categoria para o filtro
+        updateCategoryFilter();
+    } else {
+        alert('Digite uma tarefa.');
     }
 });
 
-// Carregar tarefas ao carregar a página
-window.addEventListener('load', loadTasks);
-
-// Adicionar funcionalidade de filtragem de tarefas
-allTasksButton.addEventListener('click', () => {
-    document.querySelectorAll('.task-item').forEach(task => {
-        task.style.display = 'flex';
+// Atualiza as opções de categoria do filtro
+function updateCategoryFilter() {
+    const categories = new Set();
+    document.querySelectorAll('.task-item').forEach(taskItem => {
+        const category = taskItem.getAttribute('data-category');
+        if (category) {
+            categories.add(category);
+        }
     });
+    filterCategory.innerHTML = '<option value="">Filtrar por Categoria</option>';
+    categories.forEach(category => {
+        filterCategory.innerHTML += `<option value="${category}">${category}</option>`;
+    });
+}
+
+// Filtrar tarefas
+allTasksButton.addEventListener('click', () => {
+    document.querySelectorAll('.task-item').forEach(taskItem => taskItem.style.display = 'flex');
 });
 
 pendingTasksButton.addEventListener('click', () => {
-    document.querySelectorAll('.task-item').forEach(task => {
-        task.style.display = task.classList.contains('completed') ? 'none' : 'flex';
+    document.querySelectorAll('.task-item').forEach(taskItem => {
+        if (taskItem.classList.contains('completed')) {
+            taskItem.style.display = 'none';
+        } else {
+            taskItem.style.display = 'flex';
+        }
     });
 });
 
 completedTasksButton.addEventListener('click', () => {
-    document.querySelectorAll('.task-item').forEach(task => {
-        task.style.display = task.classList.contains('completed') ? 'flex' : 'none';
+    document.querySelectorAll('.task-item').forEach(taskItem => {
+        if (taskItem.classList.contains('completed')) {
+            taskItem.style.display = 'flex';
+        } else {
+            taskItem.style.display = 'none';
+        }
     });
 });
 
-// Filtrar tarefas por categoria
 filterCategory.addEventListener('change', () => {
     const selectedCategory = filterCategory.value;
-    document.querySelectorAll('.task-item').forEach(task => {
-        const category = task.getAttribute('data-category');
-        task.style.display = selectedCategory === '' || category === selectedCategory ? 'flex' : 'none';
+    document.querySelectorAll('.task-item').forEach(taskItem => {
+        if (selectedCategory === '' || taskItem.getAttribute('data-category') === selectedCategory) {
+            taskItem.style.display = 'flex';
+        } else {
+            taskItem.style.display = 'none';
+        }
     });
 });
 
-// Filtrar tarefas por prioridade
 filterPriority.addEventListener('change', () => {
     const selectedPriority = filterPriority.value;
-    document.querySelectorAll('.task-item').forEach(task => {
-        const priority = task.getAttribute('data-priority');
-        task.style.display = selectedPriority === '' || priority === selectedPriority ? 'flex' : 'none';
+    document.querySelectorAll('.task-item').forEach(taskItem => {
+        if (selectedPriority === '' || taskItem.getAttribute('data-priority') === selectedPriority) {
+            taskItem.style.display = 'flex';
+        } else {
+            taskItem.style.display = 'none';
+        }
     });
 });
 
-// Ordenar tarefas por data de vencimento
 sortByDateButton.addEventListener('click', () => {
     const tasks = Array.from(document.querySelectorAll('.task-item'));
     tasks.sort((a, b) => {
-        const dateA = new Date(a.getAttribute('data-due-date') || 0);
-        const dateB = new Date(b.getAttribute('data-due-date') || 0);
+        const dateA = new Date(a.getAttribute('data-due-date'));
+        const dateB = new Date(b.getAttribute('data-due-date'));
         return dateA - dateB;
     });
     tasks.forEach(task => taskList.appendChild(task));
-    saveTasks();
-    updateCounters();
+    logChange('Tarefas ordenadas por data de vencimento.');
 });
 
-// Alternar entre tema escuro e claro
+// Alternar entre temas escuro e claro
 toggleThemeButton.addEventListener('click', () => {
     document.body.classList.toggle('dark-theme');
-    const isDarkTheme = document.body.classList.contains('dark-theme');
-    toggleThemeButton.textContent = isDarkTheme ? 'Tema Claro' : 'Tema Escuro';
+    toggleThemeButton.textContent = document.body.classList.contains('dark-theme') ? 'Tema Claro' : 'Tema Escuro';
 });
 
 // Atualizar contadores de tarefas
@@ -227,4 +226,5 @@ function logChange(message) {
 document.addEventListener('DOMContentLoaded', () => {
     const isDarkTheme = document.body.classList.contains('dark-theme');
     toggleThemeButton.textContent = isDarkTheme ? 'Tema Claro' : 'Tema Escuro';
+    loadTasks();
 });

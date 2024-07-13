@@ -1,23 +1,25 @@
+/* styles.css */
+
+/* Estilos Gerais */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    background-color: #f0f0f0;
+    color: #333;
     margin: 0;
+    padding: 0;
 }
 
 .container {
-    background-color: #fff;
+    max-width: 800px;
+    margin: 0 auto;
     padding: 20px;
+    background-color: #ffffff;
     border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    max-width: 600px;
-    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
+    text-align: center;
     margin-bottom: 20px;
 }
 
@@ -25,52 +27,78 @@ h1 {
     margin-bottom: 20px;
 }
 
-.theme-toggle {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 10px;
-}
-
-button {
-    padding: 10px;
-    margin: 5px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
-
-input[type="text"], input[type="date"], select, input[type="file"] {
-    width: 100%;
-    padding: 10px;
+.task-form input, .task-form button {
     margin: 5px 0;
+    padding: 10px;
     border: 1px solid #ddd;
     border-radius: 3px;
 }
 
+.task-form button {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.task-form button:hover {
+    background-color: #0056b3;
+}
+
+.task-filters button, .task-filters select {
+    margin-right: 10px;
+}
+
+.task-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
 .task-item {
     background-color: #f9f9f9;
+    border: 1px solid #ddd;
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 3px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    position: relative;
 }
 
-.task-item.dragging {
-    opacity: 0.5;
+.task-item.completed {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    text-decoration: line-through;
+}
+
+.task-item .task-checkbox {
+    margin-right: 10px;
 }
 
 .task-item .edit-button, .task-item .delete-button {
     margin-left: 10px;
 }
 
-.filter-button, .filter-category, .filter-priority {
-    margin: 5px;
+.task-item .task-file-preview {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 3px;
+    margin-left: 10px;
 }
 
+button {
+    background-color: #007bff;
+    color: #fff;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.dragging {
+    opacity: 0.5;
+}
+
+/* Tema escuro */
 .dark-theme {
     background-color: #121212;
     color: #ffffff;

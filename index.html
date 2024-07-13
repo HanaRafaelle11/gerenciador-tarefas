@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,55 +9,40 @@
 <body>
     <div class="container">
         <h1>Gerenciador de Tarefas</h1>
-        <div class="theme-toggle">
-            <button id="toggleTheme">Tema Escuro</button>
-        </div>
         <div class="task-form">
             <input type="text" id="taskInput" placeholder="Digite uma nova tarefa">
-            <input type="date" id="taskDueDate" placeholder="Data de Vencimento">
-            <select id="taskCategory">
-                <option value="">Selecione uma categoria</option>
-                <option value="Trabalho">Trabalho</option>
-                <option value="Estudos">Estudos</option>
-                <option value="Pessoal">Pessoal</option>
-            </select>
-            <select id="taskPriority">
-                <option value="">Prioridade</option>
-                <option value="Baixa">Baixa</option>
-                <option value="Média">Média</option>
-                <option value="Alta">Alta</option>
-            </select>
-            <input type="file" id="taskFile">
+            <input type="date" id="taskDueDate">
+            <input type="text" id="taskCategory" placeholder="Categoria">
+            <input type="text" id="taskPriority" placeholder="Prioridade (Baixa, Média, Alta)">
+            <input type="file" id="taskFile" accept="image/*">
             <button id="addTaskButton">Adicionar Tarefa</button>
         </div>
         <div class="task-filters">
-            <button id="allTasks" class="filter-button blue">Todas</button>
-            <button id="pendingTasks" class="filter-button red">Pendentes</button>
-            <button id="completedTasks" class="filter-button green">Concluídas</button>
-            <select id="filterCategory" class="filter-category">
+            <button id="allTasks">Todas as Tarefas</button>
+            <button id="pendingTasks">Pendentes</button>
+            <button id="completedTasks">Concluídas</button>
+            <select id="filterCategory">
                 <option value="">Filtrar por Categoria</option>
-                <option value="Trabalho">Trabalho</option>
-                <option value="Estudos">Estudos</option>
-                <option value="Pessoal">Pessoal</option>
             </select>
-            <select id="filterPriority" class="filter-priority">
+            <select id="filterPriority">
                 <option value="">Filtrar por Prioridade</option>
                 <option value="Baixa">Baixa</option>
                 <option value="Média">Média</option>
                 <option value="Alta">Alta</option>
             </select>
-            <button id="sortByDate" class="filter-button yellow">Ordenar por Data</button>
+            <button id="sortByDate">Ordenar por Data de Vencimento</button>
+            <button id="toggleThemeButton">Tema Escuro</button>
         </div>
+        <ul id="taskList" class="task-list"></ul>
         <div class="task-counters">
             <span id="pendingCount">Pendentes: 0</span>
             <span id="completedCount">Concluídas: 0</span>
         </div>
-        <ul id="taskList"></ul>
         <div class="change-log">
             <h2>Registro de Alterações</h2>
             <ul id="changeLog"></ul>
         </div>
     </div>
-    <script src="script.js"></script>
+    <script src="scripts.js"></script>
 </body>
 </html>
