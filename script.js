@@ -53,12 +53,11 @@ function createTask(text, completed = false, dueDate = '', category = '', priori
     taskItem.setAttribute('data-due-date', dueDate);
     taskItem.setAttribute('data-category', category);
     taskItem.setAttribute('data-priority', priority);
-    taskItem.setAttribute('data-file', file);
     taskItem.innerHTML = `
         <input type="checkbox" class="task-checkbox" ${completed ? 'checked' : ''}>
         <span>${text}</span>
         <small>${dueDate ? `Vencimento: ${dueDate}` : ''} ${category ? `Categoria: ${category}` : ''} ${priority ? `Prioridade: ${priority}` : ''}</small>
-        ${file ? `<img src="${file}" class="task-file-preview" alt="Anexo da Tarefa">` : ''}
+        ${file ? `<img src="${file}" alt="Anexo">` : ''}
         <button class="edit-button">Editar</button>
         <button class="delete-button">Excluir</button>
     `;
@@ -78,24 +77,61 @@ function createTask(text, completed = false, dueDate = '', category = '', priori
 
     // Adicionar a funcionalidade de editar tarefa
     taskItem.querySelector('.edit-button').addEventListener('click', () => {
-        taskInput.value = text;
-        taskDueDate.value = dueDate;
-        taskCategory.value = category;
-        taskPriority.value = priority;
-        taskFile.value = '';
-        taskList.removeChild(taskItem);
-        saveTasks();
-        updateCounters();
-        logChange(`Tarefa "${text}" removida para edição.`);
+        const newText = prompt('Editar tarefa:', text);
+        if (newText) {
+            taskItem.querySelector('span').textContent = newText;
+            logChange(`Tarefa editada para: "${newText}".`);
+            saveTasks();
+        }
     });
 
     // Adicionar a funcionalidade de excluir tarefa
     taskItem.querySelector('.delete-button').addEventListener('click', () => {
-        taskList.removeChild(taskItem);
-        saveTasks();
-        updateCounters();
-        logChange(`Tarefa "${text}" excluída.`);
+        if (confirm('Deseja realmente excluir esta tarefa?')) {
+            taskItem.remove();
+            logChange(`Tarefa "${text}" excluída.`);
+            saveTasks();
+            updateCounters();
+        }
     });
+
+    // Adicionar a funcionalidade de anexar arquivo
+    taskFile.addEventListener('change', () => {
+        const file = taskFile.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const img = document.createElement('img');
+                img.src = reader.result;
+                taskItem.appendChild(img);
+                logChange(`Arquivo anexado à tarefa: "${text}".`);
+                saveTasks();
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Adicionar a funcionalidade de arrastar e soltar tarefas
+    taskItem.setAttribute('draggable', 'true');
+    taskItem.addEventListener('dragstart', (event) => {
+        taskItem.classList.add('dragging');
+    });
+    taskItem.addEventListener('dragend', () => {
+        taskItem.classList.remove('dragging');
+    });
+    taskList.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        const afterElement = getDragAfterElement(taskList, event.clientY);
+        const dragging = document.querySelector('.dragging');
+        if (afterElement == null) {
+            taskList.appendChild(dragging);
+        } else {
+            taskList.insertBefore(dragging, afterElement);
+        }
+    });
+
+    // Atualiza opções de categoria para o filtro
+    updateCategoryFilter();
 
     return taskItem;
 }
@@ -220,6 +256,21 @@ function logChange(message) {
     const logItem = document.createElement('li');
     logItem.textContent = message;
     changeLog.appendChild(logItem);
+}
+
+// Atualiza a lista de tarefas após a conclusão de um arrasto
+function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.task-item:not(.dragging)')];
+
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
 // Inicializar a página com as configurações do tema

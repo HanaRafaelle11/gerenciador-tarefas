@@ -61,6 +61,7 @@ h1 {
     border-radius: 3px;
     display: flex;
     align-items: center;
+    position: relative;
 }
 
 .task-item.completed {
@@ -74,14 +75,6 @@ h1 {
 }
 
 .task-item .edit-button, .task-item .delete-button {
-    margin-left: 10px;
-}
-
-.task-item .task-file-preview {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 3px;
     margin-left: 10px;
 }
 
@@ -125,4 +118,26 @@ button {
 
 button:hover {
     background-color: #0056b3;
+}
+
+/* Adicionando novos estilos */
+
+/* Estilos para visualização de anexos */
+.task-item img {
+    max-width: 50px;
+    max-height: 50px;
+    margin-left: 10px;
+}
+
+/* Estilos para diferentes prioridades */
+.task-item[data-priority="Baixa"] {
+    border-left: 5px solid #d1e7dd;
+}
+
+.task-item[data-priority="Média"] {
+    border-left: 5px solid #ffc107;
+}
+
+.task-item[data-priority="Alta"] {
+    border-left: 5px solid #dc3545;
 }
