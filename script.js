@@ -1,142 +1,133 @@
-document.addEventListener('DOMContentLoaded', () => {
-    solicitarPermissaoNotificacao();
-    loadTasks();
-    document.getElementById('addTaskButton').addEventListener('click', addTask);
-    document.getElementById('allTasks').addEventListener('click', () => filterTasks('all'));
-    document.getElementById('pendingTasks').addEventListener('click', () => filterTasks('pending'));
-    document.getElementById('completedTasks').addEventListener('click', () => filterTasks('completed'));
-    document.getElementById('priorityFilter').addEventListener('change', (event) => {
-        filterTasks(event.target.value);
+// Selecionar elementos
+const taskInput = document.getElementById('taskInput');
+const taskDueDate = document.getElementById('taskDueDate');
+const taskPriority = document.getElementById('taskPriority');
+const taskCategory = document.getElementById('taskCategory');
+const addTaskButton = document.getElementById('addTaskButton');
+const taskList = document.getElementById('taskList');
+const allTasksButton = document.getElementById('allTasks');
+const pendingTasksButton = document.getElementById('pendingTasks');
+const completedTasksButton = document.getElementById('completedTasks');
+const pendingCount = document.getElementById('pendingCount');
+const completedCount = document.getElementById('completedCount');
+
+// Função para carregar tarefas do local storage
+function loadTasks() {
+    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    tasks.forEach(task => {
+        const taskItem = createTask(task.text, task.completed, task.dueDate, task.priority, task.category);
+        taskList.appendChild(taskItem);
     });
-});
-
-function solicitarPermissaoNotificacao() {
-    if (Notification.permission !== 'granted') {
-        Notification.requestPermission();
-    }
+    updateCounters();
 }
 
-function mostrarNotificacao(titulo, mensagem) {
-    if (Notification.permission === 'granted') {
-        new Notification(titulo, {
-            body: mensagem,
-            icon: 'https://example.com/icon.png'
-        });
-    }
+// Função para salvar tarefas no local storage
+function saveTasks() {
+    const tasks = [];
+    document.querySelectorAll('.task-item').forEach(taskItem => {
+        const text = taskItem.querySelector('span').textContent;
+        const completed = taskItem.classList.contains('completed');
+        const dueDate = taskItem.getAttribute('data-due-date');
+        const priority = taskItem.getAttribute('data-priority');
+        const category = taskItem.getAttribute('data-category');
+        tasks.push({ text, completed, dueDate, priority, category });
+    });
+    localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
-function mostrarNotificacaoPagina(mensagem) {
-    const notificationElement = document.getElementById('notification');
-    notificationElement.textContent = mensagem;
-    notificationElement.style.display = 'block';
-    setTimeout(() => {
-        notificationElement.style.display = 'none';
-    }, 5000);
-}
-
-function addTask() {
-    const taskText = document.getElementById('taskInput').value.trim();
-    const taskDue = document.getElementById('taskDueDate').value;
-    const taskCat = document.getElementById('taskCategory').value.trim();
-    const taskPriority = document.getElementById('taskPriority').value;
-    const taskShareEmail = document.getElementById('taskShareEmail').value.trim();
-
-    if (taskText) {
-        const taskItem = createTask(taskText, false, taskDue, taskCat, taskPriority);
-        document.getElementById('taskList').appendChild(taskItem);
-        saveTasks();
-        updateCounters();
-
-        mostrarNotificacao('Nova Tarefa Adicionada!', `Tarefa: ${taskText} adicionada com sucesso.`);
-        mostrarNotificacaoPagina(`Tarefa: ${taskText} adicionada com sucesso.`);
-
-        if (taskShareEmail) {
-            compartilharTarefa(taskText, taskDue, taskCat, taskPriority, taskShareEmail);
-        }
-    }
-}
-
-function compartilharTarefa(taskText, taskDue, taskCat, taskPriority, email) {
-    const subject = 'Nova Tarefa Compartilhada';
-    const body = `Você recebeu uma nova tarefa: ${taskText}\n
-    Categoria: ${taskCat}\n
-    Prioridade: ${taskPriority}\n
-    Data de Vencimento: ${taskDue}\n
-    Acesse o Gerenciador de Tarefas para mais detalhes.`;
-    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
-
-function createTask(text, completed, dueDate, category, priority) {
+// Função para criar uma nova tarefa
+function createTask(text, completed = false, dueDate = '', priority = '', category = '') {
     const taskItem = document.createElement('li');
-    taskItem.className = `task ${completed ? 'completed' : ''}`;
-    taskItem.dataset.completed = completed;
-    taskItem.dataset.priority = priority;
+    taskItem.className = 'task-item';
+    if (completed) taskItem.classList.add('completed');
+    taskItem.setAttribute('data-due-date', dueDate);
+    taskItem.setAttribute('data-priority', priority);
+    taskItem.setAttribute('data-category', category);
     taskItem.innerHTML = `
-        <span class="task-text">${text}</span>
-        <span class="task-category">${category}</span>
-        <span class="task-priority">${priority}</span>
-        <span class="task-due-date">${dueDate}</span>
-        <button class="complete-task">✔</button>
-        <button class="delete-task">✖</button>
+        <input type="checkbox" class="task-checkbox" ${completed ? 'checked' : ''}>
+        <span>${text}</span>
+        <small>${dueDate ? `Vencimento: ${dueDate}` : ''} ${priority ? `Prioridade: ${priority}` : ''} ${category ? `Categoria: ${category}` : ''}</small>
+        <button class="edit-button">Editar</button>
+        <button class="delete-button">Excluir</button>
     `;
 
-    taskItem.querySelector('.complete-task').addEventListener('click', () => {
-        taskItem.classList.toggle('completed');
-        taskItem.dataset.completed = taskItem.classList.contains('completed');
+    // Adicionar a funcionalidade de marcar como concluída
+    taskItem.querySelector('.task-checkbox').addEventListener('change', (event) => {
+        if (event.target.checked) {
+            taskItem.classList.add('completed');
+        } else {
+            taskItem.classList.remove('completed');
+        }
         saveTasks();
         updateCounters();
     });
 
-    taskItem.querySelector('.delete-task').addEventListener('click', () => {
+    // Adicionar a funcionalidade de excluir a tarefa
+    taskItem.querySelector('.delete-button').addEventListener('click', (event) => {
+        event.stopPropagation();
         taskItem.remove();
         saveTasks();
         updateCounters();
     });
 
+    // Adicionar a funcionalidade de editar a tarefa
+    taskItem.querySelector('.edit-button').addEventListener('click', () => {
+        const newText = prompt('Edite a tarefa:', taskItem.querySelector('span').textContent);
+        if (newText !== null && newText.trim() !== '') {
+            taskItem.querySelector('span').textContent = newText;
+            saveTasks();
+        }
+    });
+
     return taskItem;
 }
 
-function filterTasks(filter) {
-    const tasks = Array.from(document.getElementById('taskList').children);
-    tasks.forEach(task => {
-        const taskPriority = task.dataset.priority;
-        const taskStatus = task.dataset.completed;
-        if (filter === 'all' ||
-            (filter === 'pending' && taskStatus === 'false') ||
-            (filter === 'completed' && taskStatus === 'true') ||
-            (filter === taskPriority)) {
-            task.style.display = '';
-        } else {
-            task.style.display = 'none';
-        }
+// Adicionar nova tarefa
+addTaskButton.addEventListener('click', () => {
+    const taskText = taskInput.value.trim();
+    const taskDue = taskDueDate.value;
+    const taskPri = taskPriority.value.trim();
+    const taskCat = taskCategory.value.trim();
+    if (taskText) {
+        const taskItem = createTask(taskText, false, taskDue, taskPri, taskCat);
+        taskList.appendChild(taskItem);
+        taskInput.value = '';
+        taskDueDate.value = '';
+        taskPriority.value = '';
+        taskCategory.value = '';
+        saveTasks();
+        updateCounters();
+    }
+});
+
+// Carregar tarefas ao carregar a página
+window.addEventListener('load', loadTasks);
+
+// Adicionar funcionalidade de filtragem de tarefas
+allTasksButton.addEventListener('click', () => {
+    document.querySelectorAll('.task-item').forEach(task => {
+        task.style.display = 'flex';
     });
-}
+});
 
-function saveTasks() {
-    const tasks = Array.from(document.getElementById('taskList').children).map(task => ({
-        text: task.querySelector('.task-text').textContent,
-        completed: task.dataset.completed === 'true',
-        dueDate: task.querySelector('.task-due-date').textContent,
-        category: task.querySelector('.task-category').textContent,
-        priority: task.querySelector('.task-priority').textContent,
-    }));
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-}
-
-function loadTasks() {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    tasks.forEach(task => {
-        const taskItem = createTask(task.text, task.completed, task.dueDate, task.category, task.priority);
-        document.getElementById('taskList').appendChild(taskItem);
+pendingTasksButton.addEventListener('click', () => {
+    document.querySelectorAll('.task-item').forEach(task => {
+        task.style.display = task.classList.contains('completed') ? 'none' : 'flex';
     });
-    updateCounters();
-}
+});
 
+completedTasksButton.addEventListener('click', () => {
+    document.querySelectorAll('.task-item').forEach(task => {
+        task.style.display = task.classList.contains('completed') ? 'flex' : 'none';
+    });
+});
+
+// Atualizar contadores de tarefas
 function updateCounters() {
-    const tasks = Array.from(document.getElementById('taskList').children);
-    const pendingCount = tasks.filter(task => task.dataset.completed === 'false').length;
-    const completedCount = tasks.filter(task => task.dataset.completed === 'true').length;
+    const totalTasks = document.querySelectorAll('.task-item').length;
+    const completedTasks = document.querySelectorAll('.task-item.completed').length;
+    const pendingTasks = totalTasks - completedTasks;
 
-    document.getElementById('pendingCount').textContent = `Pendentes: ${pendingCount}`;
-    document.getElementById('completedCount').textContent = `Concluídas: ${completedCount}`;
+    pendingCount.textContent = `Pendentes: ${pendingTasks}`;
+    completedCount.textContent = `Concluídas: ${completedTasks}`;
 }

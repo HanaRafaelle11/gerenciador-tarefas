@@ -12,38 +12,30 @@
         <div class="task-form">
             <input type="text" id="taskInput" placeholder="Digite uma nova tarefa">
             <input type="date" id="taskDueDate" placeholder="Data de Vencimento">
-            <select id="taskCategory">
-                <option value="">Selecione uma categoria</option>
-                <option value="Trabalho">Trabalho</option>
-                <option value="Estudos">Estudos</option>
-                <option value="Pessoal">Pessoal</option>
-            </select>
             <select id="taskPriority">
                 <option value="">Prioridade</option>
-                <option value="Alta">Alta</option>
-                <option value="Média">Média</option>
-                <option value="Baixa">Baixa</option>
+                <option value="alta">Alta</option>
+                <option value="media">Média</option>
+                <option value="baixa">Baixa</option>
             </select>
-            <input type="email" id="taskShareEmail" placeholder="E-mail para compartilhar">
+            <select id="taskCategory">
+                <option value="">Categoria</option>
+                <option value="trabalho">Trabalho</option>
+                <option value="estudos">Estudos</option>
+                <option value="pessoal">Pessoal</option>
+            </select>
             <button id="addTaskButton">Adicionar Tarefa</button>
         </div>
         <div class="task-filters">
             <button id="allTasks" class="filter-button blue">Todas</button>
             <button id="pendingTasks" class="filter-button red">Pendentes</button>
             <button id="completedTasks" class="filter-button green">Concluídas</button>
-            <select id="priorityFilter" class="filter-button">
-                <option value="">Filtrar por Prioridade</option>
-                <option value="Alta">Alta</option>
-                <option value="Média">Média</option>
-                <option value="Baixa">Baixa</option>
-            </select>
         </div>
         <div class="task-counters">
             <span id="pendingCount">Pendentes: 0</span>
             <span id="completedCount">Concluídas: 0</span>
         </div>
         <ul id="taskList"></ul>
-        <div id="notification" class="notification"></div>
     </div>
     <script src="script.js"></script>
 </body>

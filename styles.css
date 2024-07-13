@@ -30,7 +30,6 @@ h1 {
 
 .task-form input[type="text"],
 .task-form input[type="date"],
-.task-form input[type="email"],
 .task-form select {
     padding: 10px;
     border: 1px solid #ccc;
@@ -97,17 +96,45 @@ h1 {
 .task-counters {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
-.notification {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    background-color: #28a745;
-    color: #fff;
-    padding: 15px;
-    border-radius: 5px;
-    display: none;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.task-item.completed {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.task-item small {
+    display: block;
+    color: #888;
+}
+
+.task-item button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #007bff;
+}
+
+.task-item button:hover {
+    text-decoration: underline;
+}
+
+.task-item .delete-button {
+    color: #dc3545;
 }
