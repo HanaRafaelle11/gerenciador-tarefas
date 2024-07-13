@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const taskNameInput = document.getElementById('task-name');
     const taskDateInput = document.getElementById('task-date');
     const taskPrioritySelect = document.getElementById('task-priority');
+    const taskSegmentSelect = document.getElementById('task-segment');
     const taskList = document.getElementById('task-list');
     const changeLogList = document.getElementById('change-log-list');
     const themeToggleButton = document.getElementById('theme-toggle');
@@ -16,49 +17,46 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.remove('dark-theme');
             themeToggleButton.textContent = 'Tema Escuro';
         }
-        localStorage.setItem('dark-theme', isDark);
     };
 
     setDarkTheme(darkTheme);
 
     themeToggleButton.addEventListener('click', () => {
         darkTheme = !darkTheme;
+        localStorage.setItem('dark-theme', darkTheme);
         setDarkTheme(darkTheme);
     });
 
-    const addTask = (name, date, priority) => {
+    const addTask = (name, date, priority, segment) => {
         const taskItem = document.createElement('li');
         taskItem.className = 'task-item';
         taskItem.draggable = true;
-
-        const taskContent = document.createElement('div');
-        taskContent.className = 'task-content';
-        taskContent.innerHTML = `
-            <div>
-                <strong>${name}</strong> - ${date} - Prioridade: ${priority}
+        taskItem.innerHTML = `
+            <div class="task-content">
+                <p><strong>${name}</strong></p>
+                <p>Data: ${date}</p>
+                <p>Prioridade: ${priority}</p>
+                <p>Segmento: ${segment}</p>
             </div>
-            <img src="https://via.placeholder.com/50" alt="Imagem Tarefa">
+            <button class="complete-button">Concluir</button>
+            <button class="delete-button">Excluir</button>
         `;
 
-        const completeButton = document.createElement('button');
-        completeButton.textContent = 'Concluir';
+        const completeButton = taskItem.querySelector('.complete-button');
         completeButton.addEventListener('click', () => {
             taskItem.classList.toggle('completed');
-            logChange(`Tarefa "${name}" marcada como ${taskItem.classList.contains('completed') ? 'concluída' : 'pendente'}`);
+            logChange(`Tarefa "${name}" ${taskItem.classList.contains('completed') ? 'concluída' : 'revertida'}`);
         });
 
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Excluir';
+        const deleteButton = taskItem.querySelector('.delete-button');
         deleteButton.addEventListener('click', () => {
             if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
-                taskItem.remove();
+                taskItem.classList.add('deleted');
+                taskItem.style.display = 'none';
                 logChange(`Tarefa "${name}" excluída`);
             }
         });
 
-        taskItem.appendChild(taskContent);
-        taskItem.appendChild(completeButton);
-        taskItem.appendChild(deleteButton);
         taskList.appendChild(taskItem);
 
         taskItem.addEventListener('dragstart', () => {
@@ -105,6 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const logChange = (message) => {
         const logItem = document.createElement('li');
         logItem.textContent = message;
+        logItem.classList.add('change-log-content');
+        logItem.addEventListener('click', () => {
+            logItem.classList.toggle('open');
+        });
         changeLogList.appendChild(logItem);
     };
 
@@ -113,9 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = taskNameInput.value.trim();
         const date = taskDateInput.value;
         const priority = taskPrioritySelect.value;
+        const segment = taskSegmentSelect.value;
 
         if (name && date) {
-            addTask(name, date, priority);
+            addTask(name, date, priority, segment);
             logChange(`Tarefa "${name}" adicionada`);
             taskNameInput.value = '';
             taskDateInput.value = '';
@@ -134,6 +137,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'completed':
                     taskItem.style.display = taskItem.classList.contains('completed') ? '' : 'none';
                     break;
+                case 'deleted':
+                    taskItem.style.display = taskItem.classList.contains('deleted') ? '' : 'none';
+                    break;
             }
         });
     };
@@ -141,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('all-tasks').addEventListener('click', () => filterTasks('all'));
     document.getElementById('pending-tasks').addEventListener('click', () => filterTasks('pending'));
     document.getElementById('completed-tasks').addEventListener('click', () => filterTasks('completed'));
+    document.getElementById('deleted-tasks').addEventListener('click', () => filterTasks('deleted'));
     document.getElementById('clear-tasks').addEventListener('click', () => {
         if (confirm('Tem certeza que deseja limpar todas as tarefas?')) {
             taskList.innerHTML = '';

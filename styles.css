@@ -109,7 +109,7 @@ input:focus, select:focus {
 
 /* Botões de Tarefas */
 .task-item button {
-    background-color: #dc3545;
+    background-color: #28a745; /* Botão Concluir em Verde */
     color: #fff;
     border: none;
     padding: 8px 12px;
@@ -119,6 +119,14 @@ input:focus, select:focus {
 }
 
 .task-item button:hover {
+    background-color: #218838;
+}
+
+.task-item button.delete-button {
+    background-color: #dc3545; /* Botão Excluir em Vermelho */
+}
+
+.task-item button.delete-button:hover {
     background-color: #c82333;
 }
 
@@ -154,6 +162,21 @@ input:focus, select:focus {
     margin: 5px 0;
     padding: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+#change-log-list li:hover {
+    background-color: #f0f4f8;
+}
+
+/* Histórico de Alterações Expansível */
+.change-log-content {
+    display: none;
+    margin-top: 10px;
+}
+
+.change-log-content.open {
+    display: block;
 }
 
 /* Tema Escuro */
@@ -192,4 +215,12 @@ input:focus, select:focus {
 
 .dark-theme input:focus, .dark-theme select:focus {
     border-color: #4CAF50;
+}
+
+.dark-theme .task-item button {
+    background-color: #28a745; /* Botão Concluir em Verde */
+}
+
+.dark-theme .task-item button.delete-button {
+    background-color: #dc3545; /* Botão Excluir em Vermelho */
 }
