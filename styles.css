@@ -1,143 +1,193 @@
-/* styles.css */
-
-/* Estilos Gerais */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    color: #333;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
     margin: 0;
-    padding: 0;
 }
 
 .container {
-    max-width: 800px;
-    margin: 0 auto;
+    background-color: #fff;
     padding: 20px;
-    background-color: #ffffff;
     border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 400px;
+    max-width: 100%;
 }
 
 h1 {
-    text-align: center;
+    margin: 0 0 20px;
+}
+
+.task-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     margin-bottom: 20px;
 }
 
-.task-form, .task-filters, .task-counters, .change-log {
-    margin-bottom: 20px;
-}
-
-.task-form input, .task-form button {
-    margin: 5px 0;
+.task-form input[type="text"],
+.task-form input[type="date"],
+.task-form select,
+.task-form input[type="file"] {
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 3px;
 }
 
 .task-form button {
-    background-color: #007bff;
+    padding: 10px 15px;
+    border: none;
+    background-color: #28a745;
     color: #fff;
+    border-radius: 3px;
+    cursor: pointer;
 }
 
 .task-form button:hover {
+    background-color: #218838;
+}
+
+.task-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.filter-button {
+    padding: 10px;
+    border: none;
+    color: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    flex: 1;
+}
+
+.filter-button.blue {
+    background-color: #007bff;
+}
+
+.filter-button.blue:hover {
     background-color: #0056b3;
 }
 
-.task-filters button, .task-filters select {
-    margin-right: 10px;
+.filter-button.red {
+    background-color: #dc3545;
 }
 
-.task-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
+.filter-button.red:hover {
+    background-color: #c82333;
+}
+
+.filter-button.green {
+    background-color: #28a745;
+}
+
+.filter-button.green:hover {
+    background-color: #218838;
+}
+
+.filter-select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.task-counters {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.task-counters span {
+    font-weight: bold;
 }
 
 .task-item {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 3px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    background-color: #fff;
     position: relative;
 }
 
 .task-item.completed {
     background-color: #d4edda;
-    border-color: #c3e6cb;
     text-decoration: line-through;
 }
 
-.task-item .task-checkbox {
+.task-item input[type="checkbox"] {
     margin-right: 10px;
 }
 
-.task-item .edit-button, .task-item .delete-button {
-    margin-left: 10px;
+.task-item span {
+    flex: 1;
 }
 
-button {
-    background-color: #007bff;
+.task-item button {
+    background-color: #ffc107;
+    border: none;
+    padding: 5px 10px;
+    margin-top: 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.task-item button:hover {
+    background-color: #e0a800;
+}
+
+.task-item button.delete-button {
+    background-color: #dc3545;
     color: #fff;
 }
 
-button:hover {
-    background-color: #0056b3;
+.task-item button.delete-button:hover {
+    background-color: #c82333;
 }
 
-.dragging {
-    opacity: 0.5;
+.task-item img {
+    max-width: 100px;
+    max-height: 100px;
+    margin-top: 10px;
 }
 
-/* Tema escuro */
 .dark-theme {
-    background-color: #121212;
-    color: #ffffff;
+    background-color: #333;
+    color: #f4f4f4;
 }
 
 .dark-theme .container {
-    background-color: #1f1f1f;
+    background-color: #444;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
 .dark-theme .task-item {
-    background-color: #2c2c2c;
-    color: #ffffff;
+    background-color: #555;
+    border: 1px solid #666;
 }
 
-.dark-theme .task-form, .dark-theme .task-filters, .dark-theme .task-counters, .dark-theme .change-log {
-    background-color: #2c2c2c;
-    color: #ffffff;
+.dark-theme .filter-button {
+    background-color: #222;
 }
 
-button {
-    background-color: #007bff;
-    color: #fff;
+.dark-theme .filter-button:hover {
+    background-color: #111;
 }
 
-button:hover {
-    background-color: #0056b3;
+.dark-theme .filter-select {
+    background-color: #555;
+    border-color: #666;
+    color: #f4f4f4;
 }
 
-/* Adicionando novos estilos */
-
-/* Estilos para visualização de anexos */
-.task-item img {
-    max-width: 50px;
-    max-height: 50px;
-    margin-left: 10px;
-}
-
-/* Estilos para diferentes prioridades */
-.task-item[data-priority="Baixa"] {
-    border-left: 5px solid #d1e7dd;
-}
-
-.task-item[data-priority="Média"] {
-    border-left: 5px solid #ffc107;
-}
-
-.task-item[data-priority="Alta"] {
-    border-left: 5px solid #dc3545;
+.dark-theme #changeLog {
+    color: #f4f4f4;
 }
