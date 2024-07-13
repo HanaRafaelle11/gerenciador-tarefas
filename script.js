@@ -1,268 +1,209 @@
-// script.js
-
-// Seletores de elementos
-const taskInput = document.getElementById('task-input');
-const taskDueDate = document.getElementById('task-due-date');
-const taskCategory = document.getElementById('task-category');
-const taskPriority = document.getElementById('task-priority');
-const taskFile = document.getElementById('task-file');
-const addTaskButton = document.getElementById('add-task-button');
-const taskList = document.getElementById('task-list-container');
-const allTasksButton = document.getElementById('all-tasks-button');
-const pendingTasksButton = document.getElementById('pending-tasks-button');
-const completedTasksButton = document.getElementById('completed-tasks-button');
-const filterCategory = document.getElementById('filter-category');
-const filterPriority = document.getElementById('filter-priority');
-const sortByDateButton = document.getElementById('sort-by-date-button');
-const toggleThemeButton = document.getElementById('toggle-theme-button');
-const pendingCount = document.createElement('div');
-const completedCount = document.createElement('div');
-const changeLog = document.getElementById('change-log-list');
-
-// Adicionar contadores de tarefas ao main
-document.querySelector('main').insertBefore(pendingCount, document.querySelector('#task-list'));
-document.querySelector('main').insertBefore(completedCount, document.querySelector('#task-list'));
-
-// Função para carregar as tarefas do localStorage
-function loadTasks() {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    tasks.forEach(task => {
-        const { text, completed, dueDate, category, priority, file } = task;
-        const taskItem = createTask(text, completed, dueDate, category, priority, file);
-        taskList.appendChild(taskItem);
-    });
-    updateCategoryFilter();
-    updatePriorityFilter();
-    updateCounters();
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
 }
 
-// Função para salvar as tarefas no localStorage
-function saveTasks() {
-    const tasks = [];
-    document.querySelectorAll('.task-item').forEach(taskItem => {
-        const text = taskItem.querySelector('span').textContent;
-        const completed = taskItem.classList.contains('completed');
-        const dueDate = taskItem.getAttribute('data-due-date');
-        const category = taskItem.getAttribute('data-category');
-        const priority = taskItem.getAttribute('data-priority');
-        const file = taskItem.querySelector('img') ? taskItem.querySelector('img').src : '';
-        tasks.push({ text, completed, dueDate, category, priority, file });
-    });
-    localStorage.setItem('tasks', JSON.stringify(tasks));
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 400px;
+    max-width: 100%;
+    overflow: hidden;
 }
 
-// Função para criar uma nova tarefa
-function createTask(text, completed = false, dueDate = '', category = '', priority = '', file = '') {
-    const taskItem = document.createElement('li');
-    taskItem.className = `task-item${completed ? ' completed' : ''}`;
-    taskItem.setAttribute('data-due-date', dueDate);
-    taskItem.setAttribute('data-category', category);
-    taskItem.setAttribute('data-priority', priority);
-    taskItem.setAttribute('draggable', true);
-
-    const taskText = document.createElement('span');
-    taskText.textContent = text;
-    taskItem.appendChild(taskText);
-
-    if (file) {
-        const taskImage = document.createElement('img');
-        taskImage.src = file;
-        taskItem.appendChild(taskImage);
-    }
-
-    const checkButton = document.createElement('button');
-    checkButton.textContent = completed ? 'Desmarcar' : 'Concluir';
-    checkButton.addEventListener('click', () => {
-        if (taskItem.classList.contains('completed')) {
-            taskItem.classList.remove('completed');
-            checkButton.textContent = 'Concluir';
-        } else {
-            taskItem.classList.add('completed');
-            checkButton.textContent = 'Desmarcar';
-        }
-        saveTasks();
-        updateCounters();
-    });
-    taskItem.appendChild(checkButton);
-
-    const deleteButton = document.createElement('button');
-    deleteButton.textContent = 'Excluir';
-    deleteButton.className = 'delete-button';
-    deleteButton.addEventListener('click', () => {
-        if (confirm('Você tem certeza que deseja excluir esta tarefa?')) {
-            taskItem.remove();
-            saveTasks();
-            updateCounters();
-        }
-    });
-    taskItem.appendChild(deleteButton);
-
-    return taskItem;
+h1 {
+    margin: 0 0 20px;
+    text-align: center;
 }
 
-// Adicionar uma nova tarefa
-addTaskButton.addEventListener('click', () => {
-    const text = taskInput.value.trim();
-    const dueDate = taskDueDate.value;
-    const category = taskCategory.value;
-    const priority = taskPriority.value;
-    const file = taskFile.files[0] ? URL.createObjectURL(taskFile.files[0]) : '';
-
-    if (text === '') {
-        alert('Por favor, digite uma tarefa.');
-        return;
-    }
-
-    const taskItem = createTask(text, false, dueDate, category, priority, file);
-    taskList.appendChild(taskItem);
-    saveTasks();
-    updateCounters();
-    taskInput.value = '';
-    taskDueDate.value = '';
-    taskCategory.value = '';
-    taskPriority.value = '';
-    taskFile.value = '';
-    updateCategoryFilter();
-    updatePriorityFilter();
-    addChangeLog(`Tarefa "${text}" adicionada.`);
-});
-
-// Filtros de Tarefas
-allTasksButton.addEventListener('click', () => {
-    document.querySelectorAll('.task-item').forEach(taskItem => {
-        taskItem.style.display = 'flex';
-    });
-});
-
-pendingTasksButton.addEventListener('click', () => {
-    document.querySelectorAll('.task-item').forEach(taskItem => {
-        if (taskItem.classList.contains('completed')) {
-            taskItem.style.display = 'none';
-        } else {
-            taskItem.style.display = 'flex';
-        }
-    });
-});
-
-completedTasksButton.addEventListener('click', () => {
-    document.querySelectorAll('.task-item').forEach(taskItem => {
-        if (taskItem.classList.contains('completed')) {
-            taskItem.style.display = 'flex';
-        } else {
-            taskItem.style.display = 'none';
-        }
-    });
-});
-
-filterCategory.addEventListener('change', () => {
-    const selectedCategory = filterCategory.value;
-    document.querySelectorAll('.task-item').forEach(taskItem => {
-        if (selectedCategory === '' || taskItem.getAttribute('data-category') === selectedCategory) {
-            taskItem.style.display = 'flex';
-        } else {
-            taskItem.style.display = 'none';
-        }
-    });
-});
-
-filterPriority.addEventListener('change', () => {
-    const selectedPriority = filterPriority.value;
-    document.querySelectorAll('.task-item').forEach(taskItem => {
-        if (selectedPriority === '' || taskItem.getAttribute('data-priority') === selectedPriority) {
-            taskItem.style.display = 'flex';
-        } else {
-            taskItem.style.display = 'none';
-        }
-    });
-});
-
-sortByDateButton.addEventListener('click', () => {
-    const tasks = Array.from(document.querySelectorAll('.task-item'));
-    tasks.sort((a, b) => {
-        const dateA = new Date(a.getAttribute('data-due-date'));
-        const dateB = new Date(b.getAttribute('data-due-date'));
-        return dateA - dateB;
-    });
-    tasks.forEach(task => taskList.appendChild(task));
-    saveTasks();
-    updateCounters();
-});
-
-// Mudar tema
-let darkMode = false;
-toggleThemeButton.addEventListener('click', () => {
-    darkMode = !darkMode;
-    if (darkMode) {
-        document.body.classList.add('dark-theme');
-        toggleThemeButton.textContent = 'Tema Claro';
-    } else {
-        document.body.classList.remove('dark-theme');
-        toggleThemeButton.textContent = 'Tema Escuro';
-    }
-});
-
-// Atualizar filtros de categoria e prioridade
-function updateCategoryFilter() {
-    const categories = new Set();
-    document.querySelectorAll('.task-item').forEach(taskItem => {
-        categories.add(taskItem.getAttribute('data-category'));
-    });
-    filterCategory.innerHTML = '<option value="">Filtrar por Categoria</option>';
-    categories.forEach(category => {
-        const option = document.createElement('option');
-        option.value = category;
-        option.textContent = category;
-        filterCategory.appendChild(option);
-    });
+.task-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
-function updatePriorityFilter() {
-    const priorities = new Set();
-    document.querySelectorAll('.task-item').forEach(taskItem => {
-        priorities.add(taskItem.getAttribute('data-priority'));
-    });
-    filterPriority.innerHTML = '<option value="">Filtrar por Prioridade</option>';
-    priorities.forEach(priority => {
-        const option = document.createElement('option');
-        option.value = priority;
-        option.textContent = priority;
-        filterPriority.appendChild(option);
-    });
+.task-form input[type="text"],
+.task-form input[type="date"],
+.task-form select,
+.task-form input[type="file"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
 }
 
-// Atualizar contadores
-function updateCounters() {
-    const totalTasks = document.querySelectorAll('.task-item').length;
-    const completedTasks = document.querySelectorAll('.task-item.completed').length;
-    const pendingTasks = totalTasks - completedTasks;
-
-    pendingCount.textContent = `Pendentes: ${pendingTasks}`;
-    completedCount.textContent = `Concluídas: ${completedTasks}`;
+.task-form button {
+    padding: 10px 15px;
+    border: none;
+    background-color: #28a745;
+    color: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-// Adicionar mudanças ao log
-function addChangeLog(message) {
-    const logItem = document.createElement('li');
-    logItem.textContent = message;
-    changeLog.appendChild(logItem);
+.task-form button:hover {
+    background-color: #218838;
 }
 
-// Arrastar e soltar
-taskList.addEventListener('dragstart', (event) => {
-    event.dataTransfer.setData('text/plain', event.target.id);
-});
+.task-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
 
-taskList.addEventListener('dragover', (event) => {
-    event.preventDefault();
-});
+.filter-button {
+    padding: 10px;
+    border: none;
+    color: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    flex: 1;
+    transition: background-color 0.3s;
+}
 
-taskList.addEventListener('drop', (event) => {
-    event.preventDefault();
-    const taskId = event.dataTransfer.getData('text/plain');
-    const taskElement = document.getElementById(taskId);
-    taskList.appendChild(taskElement);
-    saveTasks();
-});
+.filter-button.blue {
+    background-color: #007bff;
+}
 
-// Inicializar
-loadTasks();
+.filter-button.blue:hover {
+    background-color: #0056b3;
+}
+
+.filter-button.red {
+    background-color: #dc3545;
+}
+
+.filter-button.red:hover {
+    background-color: #c82333;
+}
+
+.filter-button.green {
+    background-color: #28a745;
+}
+
+.filter-button.green:hover {
+    background-color: #218838;
+}
+
+.filter-select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.task-counters {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.task-counters span {
+    font-weight: bold;
+}
+
+.task-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.task-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    position: relative;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.task-item.dragging {
+    opacity: 0.5;
+}
+
+.task-item.completed {
+    background-color: #d4edda;
+    text-decoration: line-through;
+}
+
+.task-item input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.task-item span {
+    flex: 1;
+}
+
+.task-item button {
+    background-color: #ffc107;
+    border: none;
+    padding: 5px 10px;
+    margin-top: 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.task-item button:hover {
+    background-color: #e0a800;
+}
+
+.task-item button.delete-button {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.task-item button.delete-button:hover {
+    background-color: #c82333;
+}
+
+.task-item img {
+    max-width: 100px;
+    max-height: 100px;
+    margin-top: 10px;
+}
+
+.dark-theme {
+    background-color: #333;
+    color: #f4f4f4;
+}
+
+.dark-theme .container {
+    background-color: #444;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.dark-theme .task-item {
+    background-color: #555;
+    border: 1px solid #666;
+}
+
+.dark-theme .filter-button {
+    background-color: #222;
+}
+
+.dark-theme .filter-button:hover {
+    background-color: #111;
+}
+
+.dark-theme .filter-select {
+    background-color: #555;
+    border-color: #666;
+    color: #f4f4f4;
+}
+
+.dark-theme #changeLog {
+    color: #f4f4f4;
+}
