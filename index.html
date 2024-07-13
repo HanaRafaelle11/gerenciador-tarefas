@@ -19,34 +19,31 @@
                 <option value="Pessoal">Pessoal</option>
             </select>
             <select id="taskPriority">
-                <option value="">Selecione uma prioridade</option>
-                <option value="Baixa">Baixa</option>
-                <option value="Média">Média</option>
+                <option value="">Prioridade</option>
                 <option value="Alta">Alta</option>
+                <option value="Média">Média</option>
+                <option value="Baixa">Baixa</option>
             </select>
-            <input type="file" id="taskFile" accept="image/*">
+            <input type="email" id="taskShareEmail" placeholder="E-mail para compartilhar">
             <button id="addTaskButton">Adicionar Tarefa</button>
         </div>
         <div class="task-filters">
             <button id="allTasks" class="filter-button blue">Todas</button>
             <button id="pendingTasks" class="filter-button red">Pendentes</button>
             <button id="completedTasks" class="filter-button green">Concluídas</button>
-            <select id="filterCategory" class="filter-select">
-                <option value="">Filtrar por Categoria</option>
-            </select>
-            <select id="filterPriority" class="filter-select">
+            <select id="priorityFilter" class="filter-button">
                 <option value="">Filtrar por Prioridade</option>
+                <option value="Alta">Alta</option>
+                <option value="Média">Média</option>
+                <option value="Baixa">Baixa</option>
             </select>
-            <button id="sortByDateButton" class="filter-button blue">Ordenar por Data</button>
-            <button id="toggleThemeButton" class="filter-button blue">Tema Escuro</button>
         </div>
         <div class="task-counters">
             <span id="pendingCount">Pendentes: 0</span>
             <span id="completedCount">Concluídas: 0</span>
         </div>
         <ul id="taskList"></ul>
-        <h2>Registro de Alterações</h2>
-        <ul id="changeLog"></ul>
+        <div id="notification" class="notification"></div>
     </div>
     <script src="script.js"></script>
 </body>
