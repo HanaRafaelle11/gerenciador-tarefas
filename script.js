@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const changeLogTitle = document.getElementById('change-log-title');
 
     let darkTheme = localStorage.getItem('dark-theme') === 'true';
+    let changeLogVisible = localStorage.getItem('change-log-visible') === 'true';
 
+    // Definir o tema escuro
     const setDarkTheme = (isDark) => {
         if (isDark) {
             document.body.classList.add('dark-theme');
@@ -18,6 +20,18 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.remove('dark-theme');
         }
         themeToggleButton.textContent = isDark ? 'Tema Claro' : 'Tema Escuro';
+    };
+
+    // Definir o estado do histórico de alterações
+    const setChangeLogVisibility = (isVisible) => {
+        if (isVisible) {
+            changeLogList.classList.add('open');
+            changeLogTitle.textContent = 'Histórico de Alterações';
+        } else {
+            changeLogList.classList.remove('open');
+            changeLogTitle.textContent = 'Mostrar Histórico de Alterações';
+        }
+        localStorage.setItem('change-log-visible', isVisible);
     };
 
     const addTask = (name, date, priority, segment) => {
@@ -172,8 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const toggleChangeLog = () => {
-        changeLogList.classList.toggle('open');
-        changeLogTitle.textContent = changeLogList.classList.contains('open') ? 'Histórico de Alterações' : 'Mostrar Histórico de Alterações';
+        const isVisible = !changeLogList.classList.contains('open');
+        setChangeLogVisibility(isVisible);
     };
 
     changeLogTitle.addEventListener('click', toggleChangeLog);
@@ -203,5 +217,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Carregar tarefas e tema ao iniciar
     loadTasks();
     setDarkTheme(darkTheme);
+    setChangeLogVisibility(changeLogVisible);
     setFilters();
 });
