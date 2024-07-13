@@ -1,35 +1,42 @@
-// Selecionar elementos
-const taskInput = document.getElementById('taskInput');
-const taskDueDate = document.getElementById('taskDueDate');
-const taskCategory = document.getElementById('taskCategory');
-const taskPriority = document.getElementById('taskPriority');
-const taskFile = document.getElementById('taskFile');
-const addTaskButton = document.getElementById('addTaskButton');
-const taskList = document.getElementById('taskList');
-const allTasksButton = document.getElementById('allTasks');
-const pendingTasksButton = document.getElementById('pendingTasks');
-const completedTasksButton = document.getElementById('completedTasks');
-const filterCategory = document.getElementById('filterCategory');
-const filterPriority = document.getElementById('filterPriority');
-const sortByDateButton = document.getElementById('sortByDateButton');
-const toggleThemeButton = document.getElementById('toggleThemeButton');
-const pendingCount = document.getElementById('pendingCount');
-const completedCount = document.getElementById('completedCount');
-const changeLog = document.getElementById('changeLog');
+// script.js
 
-// Função para carregar tarefas do local storage
+// Seletores de elementos
+const taskInput = document.getElementById('task-input');
+const taskDueDate = document.getElementById('task-due-date');
+const taskCategory = document.getElementById('task-category');
+const taskPriority = document.getElementById('task-priority');
+const taskFile = document.getElementById('task-file');
+const addTaskButton = document.getElementById('add-task-button');
+const taskList = document.getElementById('task-list-container');
+const allTasksButton = document.getElementById('all-tasks-button');
+const pendingTasksButton = document.getElementById('pending-tasks-button');
+const completedTasksButton = document.getElementById('completed-tasks-button');
+const filterCategory = document.getElementById('filter-category');
+const filterPriority = document.getElementById('filter-priority');
+const sortByDateButton = document.getElementById('sort-by-date-button');
+const toggleThemeButton = document.getElementById('toggle-theme-button');
+const pendingCount = document.createElement('div');
+const completedCount = document.createElement('div');
+const changeLog = document.getElementById('change-log-list');
+
+// Adicionar contadores de tarefas ao main
+document.querySelector('main').insertBefore(pendingCount, document.querySelector('#task-list'));
+document.querySelector('main').insertBefore(completedCount, document.querySelector('#task-list'));
+
+// Função para carregar as tarefas do localStorage
 function loadTasks() {
     const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
     tasks.forEach(task => {
-        const taskItem = createTask(task.text, task.completed, task.dueDate, task.category, task.priority, task.file);
+        const { text, completed, dueDate, category, priority, file } = task;
+        const taskItem = createTask(text, completed, dueDate, category, priority, file);
         taskList.appendChild(taskItem);
     });
-    updateCounters();
     updateCategoryFilter();
     updatePriorityFilter();
+    updateCounters();
 }
 
-// Função para salvar tarefas no local storage
+// Função para salvar as tarefas no localStorage
 function saveTasks() {
     const tasks = [];
     document.querySelectorAll('.task-item').forEach(taskItem => {
@@ -75,7 +82,6 @@ function createTask(text, completed = false, dueDate = '', category = '', priori
         }
         saveTasks();
         updateCounters();
-        logChange(`Tarefa '${text}' marcada como ${taskItem.classList.contains('completed') ? 'concluída' : 'pendente'}`);
     });
     taskItem.appendChild(checkButton);
 
@@ -83,50 +89,125 @@ function createTask(text, completed = false, dueDate = '', category = '', priori
     deleteButton.textContent = 'Excluir';
     deleteButton.className = 'delete-button';
     deleteButton.addEventListener('click', () => {
-        if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+        if (confirm('Você tem certeza que deseja excluir esta tarefa?')) {
             taskItem.remove();
             saveTasks();
             updateCounters();
-            logChange(`Tarefa '${text}' excluída`);
         }
     });
     taskItem.appendChild(deleteButton);
 
-    // Adicionar eventos de arrastar e soltar
-    taskItem.addEventListener('dragstart', (event) => {
-        event.dataTransfer.setData('text/plain', text);
-        event.dataTransfer.setData('text/dueDate', dueDate);
-        event.dataTransfer.setData('text/category', category);
-        event.dataTransfer.setData('text/priority', priority);
-        event.dataTransfer.setData('text/file', file);
-        event.target.classList.add('dragging');
-    });
-
-    taskItem.addEventListener('dragend', () => {
-        taskItem.classList.remove('dragging');
-    });
-
-    taskItem.addEventListener('dragover', (event) => {
-        event.preventDefault();
-        const afterElement = getDragAfterElement(taskList, event.clientY);
-        const dragging = document.querySelector('.dragging');
-        if (afterElement == null) {
-            taskList.appendChild(dragging);
-        } else {
-            taskList.insertBefore(dragging, afterElement);
-        }
-    });
-
     return taskItem;
 }
 
-// Função para atualizar a lista de categorias no filtro
+// Adicionar uma nova tarefa
+addTaskButton.addEventListener('click', () => {
+    const text = taskInput.value.trim();
+    const dueDate = taskDueDate.value;
+    const category = taskCategory.value;
+    const priority = taskPriority.value;
+    const file = taskFile.files[0] ? URL.createObjectURL(taskFile.files[0]) : '';
+
+    if (text === '') {
+        alert('Por favor, digite uma tarefa.');
+        return;
+    }
+
+    const taskItem = createTask(text, false, dueDate, category, priority, file);
+    taskList.appendChild(taskItem);
+    saveTasks();
+    updateCounters();
+    taskInput.value = '';
+    taskDueDate.value = '';
+    taskCategory.value = '';
+    taskPriority.value = '';
+    taskFile.value = '';
+    updateCategoryFilter();
+    updatePriorityFilter();
+    addChangeLog(`Tarefa "${text}" adicionada.`);
+});
+
+// Filtros de Tarefas
+allTasksButton.addEventListener('click', () => {
+    document.querySelectorAll('.task-item').forEach(taskItem => {
+        taskItem.style.display = 'flex';
+    });
+});
+
+pendingTasksButton.addEventListener('click', () => {
+    document.querySelectorAll('.task-item').forEach(taskItem => {
+        if (taskItem.classList.contains('completed')) {
+            taskItem.style.display = 'none';
+        } else {
+            taskItem.style.display = 'flex';
+        }
+    });
+});
+
+completedTasksButton.addEventListener('click', () => {
+    document.querySelectorAll('.task-item').forEach(taskItem => {
+        if (taskItem.classList.contains('completed')) {
+            taskItem.style.display = 'flex';
+        } else {
+            taskItem.style.display = 'none';
+        }
+    });
+});
+
+filterCategory.addEventListener('change', () => {
+    const selectedCategory = filterCategory.value;
+    document.querySelectorAll('.task-item').forEach(taskItem => {
+        if (selectedCategory === '' || taskItem.getAttribute('data-category') === selectedCategory) {
+            taskItem.style.display = 'flex';
+        } else {
+            taskItem.style.display = 'none';
+        }
+    });
+});
+
+filterPriority.addEventListener('change', () => {
+    const selectedPriority = filterPriority.value;
+    document.querySelectorAll('.task-item').forEach(taskItem => {
+        if (selectedPriority === '' || taskItem.getAttribute('data-priority') === selectedPriority) {
+            taskItem.style.display = 'flex';
+        } else {
+            taskItem.style.display = 'none';
+        }
+    });
+});
+
+sortByDateButton.addEventListener('click', () => {
+    const tasks = Array.from(document.querySelectorAll('.task-item'));
+    tasks.sort((a, b) => {
+        const dateA = new Date(a.getAttribute('data-due-date'));
+        const dateB = new Date(b.getAttribute('data-due-date'));
+        return dateA - dateB;
+    });
+    tasks.forEach(task => taskList.appendChild(task));
+    saveTasks();
+    updateCounters();
+});
+
+// Mudar tema
+let darkMode = false;
+toggleThemeButton.addEventListener('click', () => {
+    darkMode = !darkMode;
+    if (darkMode) {
+        document.body.classList.add('dark-theme');
+        toggleThemeButton.textContent = 'Tema Claro';
+    } else {
+        document.body.classList.remove('dark-theme');
+        toggleThemeButton.textContent = 'Tema Escuro';
+    }
+});
+
+// Atualizar filtros de categoria e prioridade
 function updateCategoryFilter() {
-    filterCategory.innerHTML = '<option value="">Filtrar por Categoria</option>';
     const categories = new Set();
     document.querySelectorAll('.task-item').forEach(taskItem => {
         categories.add(taskItem.getAttribute('data-category'));
     });
+    filterCategory.innerHTML = '<option value="">Filtrar por Categoria</option>';
     categories.forEach(category => {
         const option = document.createElement('option');
         option.value = category;
@@ -135,13 +216,12 @@ function updateCategoryFilter() {
     });
 }
 
-// Função para atualizar a lista de prioridades no filtro
 function updatePriorityFilter() {
-    filterPriority.innerHTML = '<option value="">Filtrar por Prioridade</option>';
     const priorities = new Set();
     document.querySelectorAll('.task-item').forEach(taskItem => {
         priorities.add(taskItem.getAttribute('data-priority'));
     });
+    filterPriority.innerHTML = '<option value="">Filtrar por Prioridade</option>';
     priorities.forEach(priority => {
         const option = document.createElement('option');
         option.value = priority;
@@ -150,120 +230,39 @@ function updatePriorityFilter() {
     });
 }
 
-// Função para atualizar os contadores de tarefas
+// Atualizar contadores
 function updateCounters() {
-    const pending = document.querySelectorAll('.task-item:not(.completed)').length;
-    const completed = document.querySelectorAll('.task-item.completed').length;
-    pendingCount.textContent = `Pendentes: ${pending}`;
-    completedCount.textContent = `Concluídas: ${completed}`;
+    const totalTasks = document.querySelectorAll('.task-item').length;
+    const completedTasks = document.querySelectorAll('.task-item.completed').length;
+    const pendingTasks = totalTasks - completedTasks;
+
+    pendingCount.textContent = `Pendentes: ${pendingTasks}`;
+    completedCount.textContent = `Concluídas: ${completedTasks}`;
 }
 
-// Função para adicionar uma nova tarefa
-function addTask() {
-    const text = taskInput.value.trim();
-    const dueDate = taskDueDate.value;
-    const category = taskCategory.value;
-    const priority = taskPriority.value;
-    const file = taskFile.files[0] ? URL.createObjectURL(taskFile.files[0]) : '';
-
-    if (text) {
-        const taskItem = createTask(text, false, dueDate, category, priority, file);
-        taskList.appendChild(taskItem);
-        saveTasks();
-        updateCounters();
-        logChange(`Nova tarefa adicionada: '${text}'`);
-        taskInput.value = '';
-        taskDueDate.value = '';
-        taskCategory.value = '';
-        taskPriority.value = '';
-        taskFile.value = '';
-    }
-}
-
-// Função para filtrar tarefas
-function filterTasks() {
-    const category = filterCategory.value;
-    const priority = filterPriority.value;
-
-    document.querySelectorAll('.task-item').forEach(taskItem => {
-        const taskCategory = taskItem.getAttribute('data-category');
-        const taskPriority = taskItem.getAttribute('data-priority');
-
-        if ((category === '' || taskCategory === category) &&
-            (priority === '' || taskPriority === priority)) {
-            taskItem.style.display = '';
-        } else {
-            taskItem.style.display = 'none';
-        }
-    });
-    updateCounters();
-}
-
-// Função para ordenar tarefas por data
-function sortTasksByDate() {
-    const tasks = Array.from(document.querySelectorAll('.task-item'));
-    tasks.sort((a, b) => {
-        const dateA = new Date(a.getAttribute('data-due-date') || 0);
-        const dateB = new Date(b.getAttribute('data-due-date') || 0);
-        return dateA - dateB;
-    });
-    tasks.forEach(task => taskList.appendChild(task));
-}
-
-// Função para alternar entre temas claro e escuro
-function toggleTheme() {
-    document.body.classList.toggle('dark-theme');
-    toggleThemeButton.textContent = document.body.classList.contains('dark-theme') ? 'Tema Claro' : 'Tema Escuro';
-}
-
-// Função para registrar mudanças
-function logChange(change) {
+// Adicionar mudanças ao log
+function addChangeLog(message) {
     const logItem = document.createElement('li');
-    logItem.textContent = change;
+    logItem.textContent = message;
     changeLog.appendChild(logItem);
 }
 
-// Função para encontrar o item após o qual o item arrastado deve ser colocado
-function getDragAfterElement(container, y) {
-    const draggableElements = [...container.querySelectorAll('.task-item:not(.dragging)']]);
-    return draggableElements.reduce((closest, child) => {
-        const box = child.getBoundingClientRect();
-        const offset = y - box.top - box.height / 2;
-        if (offset < 0 && offset > closest.offset) {
-            return { offset, element: child };
-        } else {
-            return closest;
-        }
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
-}
+// Arrastar e soltar
+taskList.addEventListener('dragstart', (event) => {
+    event.dataTransfer.setData('text/plain', event.target.id);
+});
+
+taskList.addEventListener('dragover', (event) => {
+    event.preventDefault();
+});
+
+taskList.addEventListener('drop', (event) => {
+    event.preventDefault();
+    const taskId = event.dataTransfer.getData('text/plain');
+    const taskElement = document.getElementById(taskId);
+    taskList.appendChild(taskElement);
+    saveTasks();
+});
 
 // Inicializar
 loadTasks();
-
-// Adicionar evento de clique para adicionar tarefa
-addTaskButton.addEventListener('click', addTask);
-
-// Adicionar eventos para filtros e botão de tema
-allTasksButton.addEventListener('click', () => {
-    document.querySelectorAll('.task-item').forEach(taskItem => taskItem.style.display = '');
-    updateCounters();
-});
-
-pendingTasksButton.addEventListener('click', () => {
-    document.querySelectorAll('.task-item').forEach(taskItem => {
-        taskItem.style.display = taskItem.classList.contains('completed') ? 'none' : '';
-    });
-    updateCounters();
-});
-
-completedTasksButton.addEventListener('click', () => {
-    document.querySelectorAll('.task-item').forEach(taskItem => {
-        taskItem.style.display = taskItem.classList.contains('completed') ? '' : 'none';
-    });
-    updateCounters();
-});
-
-filterCategory.addEventListener('change', filterTasks);
-filterPriority.addEventListener('change', filterTasks);
-sortByDateButton.addEventListener('click', sortTasksByDate);
-toggleThemeButton.addEventListener('click', toggleTheme);

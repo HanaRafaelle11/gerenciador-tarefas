@@ -7,47 +7,50 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
+    <header>
         <h1>Gerenciador de Tarefas</h1>
-        <div class="task-form">
-            <input type="text" id="taskInput" placeholder="Digite uma nova tarefa">
-            <input type="date" id="taskDueDate" placeholder="Data de Vencimento">
-            <select id="taskCategory">
-                <option value="">Selecione uma categoria</option>
-                <option value="Trabalho">Trabalho</option>
-                <option value="Estudos">Estudos</option>
-                <option value="Pessoal">Pessoal</option>
+    </header>
+    <main>
+        <section id="task-form">
+            <input type="text" id="task-input" placeholder="Digite uma nova tarefa">
+            <input type="date" id="task-due-date" placeholder="Data de Conclusão">
+            <select id="task-category">
+                <option value="">Categoria</option>
             </select>
-            <select id="taskPriority">
-                <option value="">Selecione uma prioridade</option>
+            <select id="task-priority">
+                <option value="">Prioridade</option>
                 <option value="Baixa">Baixa</option>
                 <option value="Média">Média</option>
                 <option value="Alta">Alta</option>
             </select>
-            <input type="file" id="taskFile" accept="image/*">
-            <button id="addTaskButton">Adicionar Tarefa</button>
-        </div>
-        <div class="task-filters">
-            <button id="allTasks" class="filter-button blue">Todas</button>
-            <button id="pendingTasks" class="filter-button red">Pendentes</button>
-            <button id="completedTasks" class="filter-button green">Concluídas</button>
-            <select id="filterCategory" class="filter-select">
+            <input type="file" id="task-file" accept="image/*">
+            <button id="add-task-button">Adicionar Tarefa</button>
+        </section>
+        <section id="task-filters">
+            <button id="all-tasks-button">Todas</button>
+            <button id="pending-tasks-button">Pendentes</button>
+            <button id="completed-tasks-button">Concluídas</button>
+            <select id="filter-category">
                 <option value="">Filtrar por Categoria</option>
             </select>
-            <select id="filterPriority" class="filter-select">
+            <select id="filter-priority">
                 <option value="">Filtrar por Prioridade</option>
             </select>
-            <button id="sortByDateButton" class="filter-button blue">Ordenar por Data</button>
-            <button id="toggleThemeButton" class="filter-button blue">Tema Escuro</button>
-        </div>
-        <div class="task-counters">
-            <span id="pendingCount">Pendentes: 0</span>
-            <span id="completedCount">Concluídas: 0</span>
-        </div>
-        <ul id="taskList"></ul>
-        <h2>Registro de Alterações</h2>
-        <ul id="changeLog"></ul>
-    </div>
+            <button id="sort-by-date-button">Ordenar por Data</button>
+            <button id="toggle-theme-button">Tema Escuro</button>
+        </section>
+        <section id="task-list">
+            <ul id="task-list-container">
+                <!-- Tarefas serão inseridas aqui -->
+            </ul>
+        </section>
+        <section id="change-log">
+            <h2>Log de Mudanças</h2>
+            <ul id="change-log-list">
+                <!-- Log de mudanças será exibido aqui -->
+            </ul>
+        </section>
+    </main>
     <script src="script.js"></script>
 </body>
 </html>
