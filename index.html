@@ -7,37 +7,39 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>Gerenciador de Tarefas</h1>
-        <button id="theme-toggle">Tema Escuro</button>
-    </header>
-    <main>
-        <section id="task-form-section">
-            <form id="task-form">
-                <input type="text" id="task-name" placeholder="Nome da Tarefa" required>
-                <input type="date" id="task-date" required>
-                <select id="task-priority">
-                    <option value="baixa">Baixa</option>
-                    <option value="media">Média</option>
-                    <option value="alta">Alta</option>
-                </select>
-                <button type="submit">Adicionar Tarefa</button>
-            </form>
-        </section>
-        <section id="task-filter-section">
-            <button id="all-tasks">Todas</button>
-            <button id="pending-tasks">Pendentes</button>
-            <button id="completed-tasks">Concluídas</button>
-            <button id="clear-tasks">Limpar Tudo</button>
-        </section>
-        <section id="task-list-section">
-            <ul id="task-list"></ul>
-        </section>
-        <section id="change-log-section">
-            <h2>Histórico de Alterações</h2>
-            <ul id="change-log-list"></ul>
-        </section>
-    </main>
+    <div class="container">
+        <header>
+            <h1>Gerenciador de Tarefas</h1>
+            <button id="theme-toggle">Tema Escuro</button>
+        </header>
+        <main>
+            <section id="task-form-section">
+                <form id="task-form">
+                    <input type="text" id="task-name" placeholder="Nome da Tarefa" required>
+                    <input type="date" id="task-date" required>
+                    <select id="task-priority">
+                        <option value="baixa">Baixa</option>
+                        <option value="media">Média</option>
+                        <option value="alta">Alta</option>
+                    </select>
+                    <button type="submit">Adicionar Tarefa</button>
+                </form>
+            </section>
+            <section id="task-filter-section">
+                <button id="all-tasks" class="filter-button">Todas</button>
+                <button id="pending-tasks" class="filter-button">Pendentes</button>
+                <button id="completed-tasks" class="filter-button">Concluídas</button>
+                <button id="clear-tasks" class="filter-button">Limpar Tudo</button>
+            </section>
+            <section id="task-list-section">
+                <ul id="task-list"></ul>
+            </section>
+            <section id="change-log-section">
+                <h2>Histórico de Alterações</h2>
+                <ul id="change-log-list"></ul>
+            </section>
+        </main>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>

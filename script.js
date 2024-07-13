@@ -56,12 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        taskItem.append(taskContent, completeButton, deleteButton);
+        taskItem.appendChild(taskContent);
+        taskItem.appendChild(completeButton);
+        taskItem.appendChild(deleteButton);
         taskList.appendChild(taskItem);
 
-        taskItem.addEventListener('dragstart', (event) => {
-            event.dataTransfer.setData('text/plain', taskItem.innerHTML);
-            event.dataTransfer.setData('text/task-name', name);
+        taskItem.addEventListener('dragstart', () => {
             taskItem.classList.add('dragging');
         });
 
