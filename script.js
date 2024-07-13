@@ -1,4 +1,3 @@
-// Selecionar elementos
 const taskInput = document.getElementById('taskInput');
 const taskDueDate = document.getElementById('taskDueDate');
 const taskCategory = document.getElementById('taskCategory');
@@ -10,7 +9,6 @@ const completedTasksButton = document.getElementById('completedTasks');
 const pendingCount = document.getElementById('pendingCount');
 const completedCount = document.getElementById('completedCount');
 
-// Função para carregar tarefas do local storage
 function loadTasks() {
     const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
     tasks.forEach(task => {
@@ -20,7 +18,6 @@ function loadTasks() {
     updateCounters();
 }
 
-// Função para salvar tarefas no local storage
 function saveTasks() {
     const tasks = [];
     document.querySelectorAll('.task-item').forEach(taskItem => {
@@ -33,7 +30,6 @@ function saveTasks() {
     localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
-// Função para criar uma nova tarefa
 function createTask(text, completed = false, dueDate = '', category = '') {
     const taskItem = document.createElement('li');
     taskItem.className = 'task-item';
@@ -48,7 +44,6 @@ function createTask(text, completed = false, dueDate = '', category = '') {
         <button class="delete-button">Excluir</button>
     `;
 
-    // Adicionar a funcionalidade de marcar como concluída
     taskItem.querySelector('.task-checkbox').addEventListener('change', (event) => {
         if (event.target.checked) {
             taskItem.classList.add('completed');
@@ -59,7 +54,6 @@ function createTask(text, completed = false, dueDate = '', category = '') {
         updateCounters();
     });
 
-    // Adicionar a funcionalidade de excluir a tarefa
     taskItem.querySelector('.delete-button').addEventListener('click', (event) => {
         event.stopPropagation();
         taskItem.remove();
@@ -67,7 +61,6 @@ function createTask(text, completed = false, dueDate = '', category = '') {
         updateCounters();
     });
 
-    // Adicionar a funcionalidade de editar a tarefa
     taskItem.querySelector('.edit-button').addEventListener('click', () => {
         const newText = prompt('Edite a tarefa:', taskItem.querySelector('span').textContent);
         if (newText !== null && newText.trim() !== '') {
@@ -79,7 +72,6 @@ function createTask(text, completed = false, dueDate = '', category = '') {
     return taskItem;
 }
 
-// Adicionar nova tarefa
 addTaskButton.addEventListener('click', () => {
     const taskText = taskInput.value.trim();
     const taskDue = taskDueDate.value;
@@ -95,10 +87,8 @@ addTaskButton.addEventListener('click', () => {
     }
 });
 
-// Carregar tarefas ao carregar a página
 window.addEventListener('load', loadTasks);
 
-// Adicionar funcionalidade de filtragem de tarefas
 allTasksButton.addEventListener('click', () => {
     document.querySelectorAll('.task-item').forEach(task => {
         task.style.display = 'flex';
@@ -117,7 +107,6 @@ completedTasksButton.addEventListener('click', () => {
     });
 });
 
-// Atualizar contadores de tarefas
 function updateCounters() {
     const totalTasks = document.querySelectorAll('.task-item').length;
     const completedTasks = document.querySelectorAll('.task-item.completed').length;

@@ -7,16 +7,30 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Gerenciador de Tarefas</h1>
-    <input type="text" id="nova-tarefa" placeholder="Adicionar nova tarefa">
-    <button onclick="adicionarTarefa()">Adicionar Tarefa</button>
-    <div>
-        <button onclick="filtrarTarefas('todas')">Todas</button>
-        <button onclick="filtrarTarefas('pendentes')">Pendentes</button>
-        <button onclick="filtrarTarefas('concluidas')">Concluídas</button>
+    <div class="container">
+        <h1>Gerenciador de Tarefas</h1>
+        <div class="task-form">
+            <input type="text" id="taskInput" placeholder="Digite uma nova tarefa">
+            <input type="date" id="taskDueDate" placeholder="Data de Vencimento">
+            <select id="taskCategory">
+                <option value="">Selecione uma categoria</option>
+                <option value="Trabalho">Trabalho</option>
+                <option value="Estudos">Estudos</option>
+                <option value="Pessoal">Pessoal</option>
+            </select>
+            <button id="addTaskButton">Adicionar Tarefa</button>
+        </div>
+        <div class="task-filters">
+            <button id="allTasks" class="filter-button blue">Todas</button>
+            <button id="pendingTasks" class="filter-button red">Pendentes</button>
+            <button id="completedTasks" class="filter-button green">Concluídas</button>
+        </div>
+        <div class="task-counters">
+            <span id="pendingCount">Pendentes: 0</span>
+            <span id="completedCount">Concluídas: 0</span>
+        </div>
+        <ul id="taskList"></ul>
     </div>
-    <ul id="lista-tarefas"></ul>
-
     <script src="script.js"></script>
 </body>
 </html>
