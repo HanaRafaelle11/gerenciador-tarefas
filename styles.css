@@ -151,28 +151,16 @@ input:focus, select:focus {
     margin: 20px 0;
 }
 
-#change-log-toggle {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
+#change-log-title {
     cursor: pointer;
-    font-size: 16px;
-    margin-bottom: 10px;
-}
-
-#change-log-toggle:hover {
-    background-color: #0056b3;
+    color: #007bff;
 }
 
 #change-log-list {
     list-style: none;
     padding: 0;
-}
-
-#change-log-list.hidden {
-    display: none;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 #change-log-list li {
