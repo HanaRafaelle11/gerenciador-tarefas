@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,44 +8,27 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Gerenciador de Tarefas</h1>
-            <button id="theme-toggle">Tema Escuro</button>
-        </header>
-        <main>
-            <section id="task-form-section">
-                <form id="task-form">
-                    <input type="text" id="task-name" placeholder="Nome da Tarefa" required>
-                    <input type="date" id="task-date" required>
-                    <select id="task-priority">
-                        <option value="baixa">Baixa</option>
-                        <option value="media">Média</option>
-                        <option value="alta">Alta</option>
-                    </select>
-                    <select id="task-segment">
-                        <option value="trabalho">Trabalho</option>
-                        <option value="estudos">Estudos</option>
-                        <option value="pessoal">Pessoal</option>
-                        <option value="outros">Outros</option>
-                    </select>
-                    <button type="submit">Adicionar Tarefa</button>
-                </form>
-            </section>
-            <section id="task-filter-section">
-                <button id="all-tasks" class="filter-button">Todas</button>
-                <button id="pending-tasks" class="filter-button">Pendentes</button>
-                <button id="completed-tasks" class="filter-button">Concluídas</button>
-                <button id="deleted-tasks" class="filter-button">Excluídos</button>
-                <button id="clear-tasks" class="filter-button">Limpar Tudo</button>
-            </section>
-            <section id="task-list-section">
-                <ul id="task-list"></ul>
-            </section>
-            <section id="change-log-section">
-                <h2 id="change-log-title">Histórico de Alterações</h2>
-                <ul id="change-log-list"></ul>
-            </section>
-        </main>
+        <h1>Gerenciador de Tarefas</h1>
+        <button id="theme-toggle" class="theme-toggle-button">Tema Escuro</button>
+        <form id="task-form">
+            <input type="text" id="task-name" placeholder="Nome da Tarefa" required>
+            <input type="date" id="task-date" required>
+            <select id="task-priority" required>
+                <option value="Alta">Alta</option>
+                <option value="Média">Média</option>
+                <option value="Baixa">Baixa</option>
+            </select>
+            <select id="task-segment" required>
+                <option value="Trabalho">Trabalho</option>
+                <option value="Estudos">Estudos</option>
+                <option value="Pessoal">Pessoal</option>
+                <option value="Outros">Outros</option>
+            </select>
+            <button type="submit">Adicionar Tarefa</button>
+        </form>
+        <ul id="task-list"></ul>
+        <h2 id="change-log-title">Mostrar Histórico de Alterações</h2>
+        <ul id="change-log-list"></ul>
     </div>
     <script src="script.js"></script>
 </body>
